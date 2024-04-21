@@ -1,12 +1,17 @@
 <script setup>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { onBeforeMount, onBeforeUnmount } from "vue";
 import { useStore } from "vuex";
+import axios from "axios";
+import querystring from "querystring";
+import security from "../../../security"
 
-import Navbar from "@/examples/PageLayout/Navbar.vue";
-import AppFooter from "@/examples/PageLayout/Footer.vue";
 import ArgonInput from "@/components/ArgonInput.vue";
-import ArgonSwitch from "@/components/ArgonSwitch.vue";
 import ArgonButton from "@/components/ArgonButton.vue";
+import Swal from 'sweetalert2'
+
+const router = useRouter();
 
 const store = useStore();
 const toggleDefaultLayout = () => store.commit("toggleDefaultLayout");
@@ -19,107 +24,114 @@ onBeforeUnmount(() => {
   store.state.hideConfigButton = false;
   toggleDefaultLayout();
 });
+
+const id = ref('');
+const password = ref('');
+
+const onSubmit = async () => {
+  if (!id.value.trim() || !password.value.trim()) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: 'Your data contains empty values.',
+    });
+    return;
+  }
+  try {
+    const response = await axios.post("https://v8test.com/pit/manager/signin", {
+      data: security.encrypt(querystring.stringify({id: id.value, password: password.value})),
+    });
+    if (response.data.status === "success" && response.data.message.is_mfa === true){
+      console.log(response)
+      const MFA_id = response.data.message.id;
+      const session_id = response.data.message.session_id;
+      store.commit('setUserSession', { MFA_id, session_id });
+      await router.push({name: 'Verification Basic'});
+    }
+    else if (response.data.status === "success" && response.data.message.access_token && response.data.message.refresh_token) {
+      console.log(response);
+      const access_token = response.data.message.access_token;
+      const refresh_token = response.data.message.refresh_token;
+      const pit_manager_id = response.data.message.pit_manager_id;
+      await store.dispatch('login', {
+        accessToken: access_token,
+        refreshToken: refresh_token,
+        pitManagerId: pit_manager_id
+      });
+      await store.dispatch('fetchPitManagerInfo');
+      await router.push({name: 'selectMenuPage'});
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Account',
+        text: 'The account information is not vaild'
+      })
+
+    }
+  } catch (error) {
+    console.error("Login error:", error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'An error occurred during the login process.',
+    });
+  }
+};
 </script>
+
 <template>
-  <div class="container top-0 position-sticky z-index-sticky">
-    <div class="row">
-      <div class="col-12">
-        <navbar
-          is-blur="blur border-radius-lg my-3 py-2 start-0 end-0 mx-4 shadow"
-          btn-background="bg-gradient-success"
-          :dark-mode="true"
-        />
-      </div>
-    </div>
-  </div>
   <main class="main-content main-content-bg mt-0">
     <div
-      class="page-header min-vh-100"
-      style="
-        background-image: url(&quot;https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/signin-basic.jpg&quot;);
+        class="page-header min-vh-100"
+        style="
+        background-color: #444444;
       "
     >
       <span class="mask bg-gradient-dark opacity-6"></span>
       <div class="container">
         <div class="row justify-content-center">
-          <div class="col-lg-4 col-md-7 mt-2">
+          <div class="col-lg-10 col-md-7 mt-2">
             <div class="card border-0 mb-0">
-              <div class="card-header bg-transparent">
-                <h5 class="text-dark text-center mt-2 mb-3">Sign in</h5>
-                <div class="btn-wrapper text-center">
-                  <a
-                    href="javascript:;"
-                    class="btn btn-neutral btn-icon btn-sm mb-0 me-1"
-                  >
-                    <img
-                      class="w-30"
-                      src="../../assets/img/logos/github.svg"
-                    />
-                    Github
-                  </a>
-                  <a
-                    href="javascript:;"
-                    class="btn btn-neutral btn-icon btn-sm mb-0"
-                  >
-                    <img
-                      class="w-30"
-                      src="../../assets/img/logos/google.svg"
-                    />
-                    Google
-                  </a>
+              <div class="info-wrap">
+                <div class="img-box">
+                  <img src="../../assets/PageImage/EnterImage.jpg" alt="image" style="">
                 </div>
-              </div>
-              <div class="card-body px-lg-5 pt-0">
-                <div class="text-center text-muted mb-4">
-                  <small>Or sign in with credentials</small>
-                </div>
-                <form role="form" class="text-start">
-                  <div class="mb-3">
-                    <argon-input
-                      id="email"
-                      type="email"
-                      placeholder="Email"
-                      aria-label="Email"
-                    />
+                <div class="login-box">
+                  <div class="text-box">
+                    <h5 class="logo">nextstud.io</h5>
+                    <h5 class="logo-sub">Pitmanager Monitoring System</h5>
                   </div>
-                  <div class="mb-3">
-                    <argon-input
-                      id="password"
-                      type="password"
-                      placeholder="Password"
-                      aria-label="Password"
-                    />
-                  </div>
-                  <argon-switch id="rememberMe" name="rememberMe">
-                    Remember me
-                  </argon-switch>
+                  <form role="form" class="text-start" @submit.prevent="onSubmit">
+                    <div class="mb-3">
+                      <argon-input
+                          v-model="id"
+                          id="ID"
+                          type="text"
+                          placeholder="ID"
+                          aria-label="ID"
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <argon-input
+                          v-model="password"
+                          id="password"
+                          type="password"
+                          placeholder="Password"
+                          aria-label="Password"
+                      />
+                    </div>
 
-                  <div class="text-center">
-                    <argon-button
-                      color="success"
-                      variant="gradient"
-                      full-width
-                      class="my-4 mb-2"
+                    <div class="text-center">
+                      <argon-button
+                          color="dark"
+                          variant="gradient"
+                          full-width
+                          class="my-4 mb-2"
                       >Sign in</argon-button
-                    >
-                  </div>
-                  <div class="mb-2 position-relative text-center">
-                    <p
-                      class="text-sm font-weight-bold mb-2 text-secondary text-border d-inline z-index-2 bg-white px-3"
-                    >
-                      or
-                    </p>
-                  </div>
-                  <div class="text-center">
-                    <argon-button
-                      color="dark"
-                      variant="gradient"
-                      full-width
-                      class="mt-2 mb-4"
-                      >Sign up</argon-button
-                    >
-                  </div>
-                </form>
+                      >
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
@@ -127,5 +139,58 @@ onBeforeUnmount(() => {
       </div>
     </div>
   </main>
-  <app-footer />
+
 </template>
+
+<style scoped>
+.login-box{
+  width: 35%;
+  margin: auto auto;
+}
+.text-box{
+  width: 100%;
+  text-align: center;
+}
+.logo{
+  font-size: 50px;
+  font-weight: bold;
+  color: #222222;
+}
+.logo-sub{
+  font-size: 20px;
+  color: #666666;
+  margin-bottom: 30px;
+}
+.info-wrap{
+  display: flex;
+  justify-content: space-between;
+}
+.img-box {
+  margin: 20px 20px;
+  width: 480px;
+  height: 600px;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  animation: slideIn 1.5s ease-in-out forwards;
+}
+
+@keyframes slideIn {
+  from {
+    right: -50%; /* 시작 위치 (오른쪽 바깥에서 시작) */
+  }
+  to {
+    right: 0%; /* 최종 위치 (원래 위치) */
+  }
+}
+.img-box img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+form{
+  width: 80%;
+  margin: 0 auto;
+}
+</style>
