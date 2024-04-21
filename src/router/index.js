@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Basic from "../views/auth/Basic.vue";
 import Enter from "@/views/Enter/Enter.vue";
+import MainPage from "@/views/MainPage/MainPage.vue";
 
 
 const routes = [
@@ -19,6 +20,11 @@ const routes = [
     name: "SignIn",
     component: Basic
   },
+  {
+    path: "/MainPage/",
+    name: "MainPage",
+    component: MainPage
+  }
 
 ];
 

@@ -59,7 +59,7 @@ const onSubmit = async () => {
         pitManagerId: pit_manager_id
       });
       await store.dispatch('fetchPitManagerInfo');
-      await router.push({name: 'selectMenuPage'});
+      await router.push({name: 'MainPage'});
     } else {
       Swal.fire({
         icon: 'error',
@@ -177,10 +177,10 @@ const onSubmit = async () => {
 
 @keyframes slideIn {
   from {
-    right: -50%; /* 시작 위치 (오른쪽 바깥에서 시작) */
+    right: -50%;
   }
   to {
-    right: 0%; /* 최종 위치 (원래 위치) */
+    right: 0%;
   }
 }
 .img-box img{
