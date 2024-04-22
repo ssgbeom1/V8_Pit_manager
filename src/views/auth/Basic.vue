@@ -98,7 +98,7 @@ const onSubmit = async () => {
                 </div>
                 <div class="login-box">
                   <div class="text-box">
-                    <h5 class="logo">nextstud.io</h5>
+                    <h5 class="logo">Sign - in</h5>
                     <h5 class="logo-sub">Pitmanager Monitoring System</h5>
                   </div>
                   <form role="form" class="text-start" @submit.prevent="onSubmit">

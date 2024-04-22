@@ -47,7 +47,6 @@ const initializeDataTable = async () => {
     dataTable.body.addEventListener('change', e => {
       if (e.target.type === 'checkbox') {
         const userId = parseInt(e.target.dataset.id, 10);
-        const user = users.find(user => user.id === userId);
 
         if (e.target.checked && selectedUsers.value.length < maxSelections) {
           selectedUsers.value.push(userId);
@@ -248,6 +247,14 @@ onBeforeUnmount(() => {
   z-index: 2;
   color: white;
   position: relative;
+  font-weight: bold;
+  font-size: 30px;
+}
+.text-background{
+  z-index: 2;
+  color: white;
+  position: relative;
+  top: 30%;
   font-weight: bold;
   font-size: 30px;
 }
