@@ -5,9 +5,7 @@ import { onBeforeMount, onBeforeUnmount } from "vue";
 import { useStore } from "vuex";
 import axios from "axios";
 import querystring from "querystring";
-import security from "../../../security"
-
-import ArgonInput from "@/components/ArgonInput.vue";
+import security from "@/security"
 import ArgonButton from "@/components/ArgonButton.vue";
 import Swal from 'sweetalert2'
 
@@ -46,7 +44,7 @@ const onSubmit = async () => {
       const MFA_id = response.data.message.id;
       const session_id = response.data.message.session_id;
       store.commit('setUserSession', { MFA_id, session_id });
-      await router.push({name: 'Verification Basic'});
+      await router.push({name: 'mfa'});
     }
     else if (response.data.status === "success" && response.data.message.access_token && response.data.message.refresh_token) {
       console.log(response);
@@ -103,24 +101,23 @@ const onSubmit = async () => {
                   </div>
                   <form role="form" class="text-start" @submit.prevent="onSubmit">
                     <div class="mb-3">
-                      <argon-input
+                      <el-input
                           v-model="id"
-                          id="ID"
-                          type="text"
+                          size="large"
+                          style="width: 100%"
                           placeholder="ID"
-                          aria-label="ID"
                       />
                     </div>
                     <div class="mb-3">
-                      <argon-input
+                      <el-input
                           v-model="password"
-                          id="password"
+                          size="large"
+                          style="width: 100%"
                           type="password"
-                          placeholder="Password"
-                          aria-label="Password"
+                          placeholder="password"
+                          show-password
                       />
                     </div>
-
                     <div class="text-center">
                       <argon-button
                           color="dark"
@@ -172,6 +169,7 @@ const onSubmit = async () => {
   border-radius: 20px;
   overflow: hidden;
   position: relative;
+  z-index: 10;
   animation: slideIn 1.5s ease-in-out forwards;
 }
 

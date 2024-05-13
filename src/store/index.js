@@ -2,7 +2,7 @@ import { createStore } from "vuex";
 import bootstrap from "bootstrap/dist/js/bootstrap.min.js";
 import axios from "axios";
 import querystring from "querystring";
-import security from '../../security'
+import security from '../security'
 import createPersistedState from "vuex-persistedstate"
 
 export default createStore({

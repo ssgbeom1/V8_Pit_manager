@@ -1,6 +1,18 @@
 <script setup>
-import downArrWhite from "@/assets/img/down-arrow-white.svg";
-import downArrBlack from "@/assets/img/down-arrow-dark.svg";
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
+import {computed} from "vue";
+
+const store = useStore();
+const router = useRouter();
+const pitManagerInfo = computed(() => store.state.pitManagerInfo);
+
+const logout = () => {
+  console.log(pitManagerInfo.value)
+  store.dispatch('logout');
+  console.log(pitManagerInfo.value)
+  router.push({ name: 'SignIn' });
+}
 
 defineProps({
   btnBackground: {
@@ -18,113 +30,104 @@ defineProps({
 });
 </script>
 <template>
-
-  <nav
-    class="navbar navbar-expand-lg top-0 z-index-3 position-absolute mt-4"
-    :class="isBlur ? isBlur : 'shadow-none my-2 navbar-transparent w-100'"
-  >
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg top-0 z-index-3 position-absolute mt-4" :class="isBlur ? isBlur : 'shadow-none my-2 navbar-transparent w-100'">
     <div class="container ps-2 pe-0">
-      <router-link
-        class="navbar-brand font-weight-bolder ms-lg-0 ms-3"
-        :class="darkMode ? 'text-black' : 'text-white'"
-        to="/"
-        >Pit Manager Admin</router-link
-      >
-      <button
-        class="shadow-none navbar-toggler ms-2"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navigation"
-        aria-controls="navigation"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="mt-2 navbar-toggler-icon">
-          <span class="navbar-toggler-bar bar1"></span>
-          <span class="navbar-toggler-bar bar2"></span>
-          <span class="navbar-toggler-bar bar3"></span>
-        </span>
-      </button>
-      <div
-        id="navigation"
-        class="pt-3 pb-2 collapse navbar-collapse w-100 py-lg-0"
-      >
-        <ul class="mx-auto navbar-nav navbar-nav-hover">
-          <li class="mx-2 nav-item dropdown dropdown-hover">
-            <a
-              id="dropdownMenuDocs"
-              role="button"
-              class="cursor-pointer nav-link ps-2 d-flex justify-content-between align-items-center"
-              :class="darkMode && 'text-dark'"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              Docs
-              <img
-                :src="downArrWhite"
-                alt="down-arrow"
-                class="arrow ms-1"
-                :class="darkMode ? 'd-none' : 'd-lg-block d-none'"
-              />
-              <img
-                :src="downArrBlack"
-                alt="down-arrow"
-                class="arrow ms-1 d-block"
-                :class="darkMode ? 'd-lg-block' : 'd-lg-none'"
-              />
-            </a>
-            <div
-              class="p-3 mt-0 dropdown-menu dropdown-menu-animation dropdown-lg mt-lg-3 border-radius-lg"
-              aria-labelledby="dropdownMenuDocs"
-            >
-              <div class="d-none d-lg-block">
-                <ul class="list-group">
-                  <li class="p-0 border-0 nav-item list-group-item">
-                    <a
-                      class="py-2 dropdown-item ps-3 border-radius-md"
-                      href="https://www.creative-tim.com/learning-lab/vue/overview/argon-dashboard/"
-                    >
-                      <div class="d-flex">
-                        <div class="h-10 mt-1 icon me-3 d-flex">
-                          <i class="ni ni-planet text-success"></i>
-                        </div>
-                        <div>
-                          <h6
-                            class="p-0 dropdown-header text-dark font-weight-bolder d-flex align-items-center"
-                          >
-                            Getting Started
-                          </h6>
-                          <span class="text-sm">
-                            All about overview, quick start, license and
-                            contents
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-              <div class="row d-lg-none">
-                <div class="col-md-12 g-0">
-
-                </div>
-              </div>
+      <router-link class="navbar-brand font-weight-bolder ms-lg-0 ms-3" :class="darkMode ? 'text-black' : 'text-white'" to="/mainPage">
+        Pit-Manager Monitoring System
+      </router-link>
+    </div>
+    <div class="dropdown">
+        <div class="img-box dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          <img class="user-img" :src=pitManagerInfo.image_url >
+        </div>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <li>
+          <div class="info-text-area">
+            <div class="main-text">
+              welcome!
             </div>
-          </li>
-        </ul>
-        <ul class="navbar-nav d-lg-block d-none">
-          <li class="nav-item">
-            <a
-              href="https://www.creative-tim.com/product/vue-argon-dashboard-pro"
-              class="mb-0 btn btn-sm me-1"
-              :class="btnBackground ? btnBackground : 'bg-white text-dark'"
-              onclick="smoothToPricing('pricing-soft-ui')"
-              >Buy Now</a
-            >
-          </li>
-        </ul>
-      </div>
+            <div class="user-name">
+              {{pitManagerInfo.name}}
+            </div>
+          </div>
+        </li>
+        <li><hr class="dropdown-divider divider2"></li>
+        <li>
+          <router-link :to="{name: 'mypage'}" class="dropdown-item">My Page</router-link>
+        </li>
+        <li>
+          <button class="gray-btn" @click="logout">
+            Logout
+          </button>
+        </li>
+      </ul>
     </div>
   </nav>
-  <!-- End Navbar -->
 </template>
+
+
+<style scoped>
+.dropdown-toggle::after, .dropdown-toggle::before {
+  display: none;
+}
+.dropdown-menu{
+  padding-bottom: 0;
+}
+.img-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid #444444;
+}
+.user-img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.info-text-area{
+  display: flex;
+  padding: 0.3rem 1rem;
+  align-items: center;
+}
+.main-text{
+  margin-right: 0.5rem;
+}
+.user-name{
+  font-weight: bold;
+}
+
+.divider2{
+
+}
+.gray-btn {
+  width: 100%;
+  height: 100%;
+  background-color: #FFFFFF;
+  border-width: 0;
+  box-sizing: border-box;
+  color: #777777;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 20px;
+  margin: 0;
+  opacity: 1;
+  outline: 0;
+  padding: 0.2rem 1rem;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  border-top: 1px solid #777777;
+  margin-top: 10px;
+}
+
+.gray-btn:hover{
+  color: white;
+  background-color: #777777;
+  transition-duration: .5s;
+}
+</style>
