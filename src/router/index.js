@@ -8,8 +8,8 @@ import SavedVideo from "@/views/list/SavedVideo.vue";
 import VideoPage from "@/views/list/VideoPage.vue";
 import MyPage from "@/views/mypage/MyPage.vue";
 import {computed} from "vue";
-
-
+import { useStore } from "vuex";
+const store = useStore();
 const routes = [
   {
     path: "/",
@@ -74,7 +74,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    const accessToken = store.getters.getAccessToken;
+    const accessToken = computed(() => store.getters.getAccessToken);
     if (!accessToken) {
       next({ name: 'SignIn' });
     } else {
