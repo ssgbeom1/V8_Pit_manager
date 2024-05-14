@@ -1,5 +1,5 @@
 <script setup>
-import {onBeforeMount, onBeforeUnmount, onMounted, ref} from "vue";
+import {onBeforeMount, onBeforeUnmount, onMounted, ref, computed} from "vue";
 import {useStore} from "vuex";
 import axios from "axios";
 import security from "@/security";
@@ -8,6 +8,7 @@ import {ElDatePicker, ElOption, ElPagination, ElSelect, ElTable, ElTableColumn} 
 import { format, parseISO } from 'date-fns';
 import {auto} from "@popperjs/core";
 import * as XLSX from 'xlsx';
+import router from "@/router";
 const store = useStore();
 
 const toggleDefaultLayout = () => store.commit("toggleDefaultLayout");
@@ -20,7 +21,7 @@ const length = ref(10);
 const searchOption = ref('') // name, game, type, table
 const search = ref('')
 
-const pitManagerId = ref(1) // 나중에 vuex 에서 가져와야 하는 값
+const pitManagerId = computed(() => store.state.pitManagerInfo.pit_managers_id);
 
 // 계산된 총 페이지 수 페이지네이션 전달
 const totalPages = ref(0);
@@ -164,11 +165,13 @@ const sendDealerReport = async () => {
       data: security.encrypt(querystring.stringify(data)),
     });
     if (response.data.status === 'success') {
-      console.log('Report Sending Success');
+      console.log('Dealer Report Sending Success');
       description.value = ''
       selectedReportType.value = ''
     } else {
       console.error('Response error', response.data.message);
+      description.value = ''
+      selectedReportType.value = ''
     }
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -201,11 +204,15 @@ const sendPlayerReport = async () => {
       data: security.encrypt(querystring.stringify(data)),
     });
     if (response.data.status === 'success') {
-      console.log('Report Sending Success')
+      console.log('Player Report Sending Success')
       description.value = ''
       selectedReportType.value = ''
+      playerName.value =''
     } else {
       console.error('Response error', response.data.message);
+      description.value = ''
+      selectedReportType.value = ''
+      playerName.value =''
     }
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -434,19 +441,31 @@ const playerSendMacro = async () => {
 }
 
 const backMacro = () => {
-  setInitialView(),
-      description.value = ''
+  setInitialView();
+  description.value = ''
   selectedReportType.value = ''
 }
+const clearReport = () => {
+  description.value = ''
+  selectedReportType.value = ''
+  playerName.value =''
+}
 
+const toMainPage = () => router.push({ name: 'MainPage' });
 </script>
 
 <template>
   <main class="main-content mt-0">
     <div class="page-header min-vh-100" style="background-color:#222222;">
       <div class="container-xxl card">
-        <div class="title">
-          Saved Video
+        <div class="title-wrap">
+          <div class="title">
+            Saved Video
+          </div>
+          <button class="button-57" role="button" @click="toMainPage">
+            <span class="text">MainPage<i class="fa-solid fa-door-open" style="color: #777777; margin-left: 5px"></i></span>
+            <span><i class="fa-solid fa-arrow-right" style="font-size: 25px"></i></span>
+          </button>
         </div>
         <div class="search-box">
           <div class="search-area">
@@ -467,19 +486,6 @@ const backMacro = () => {
                       range-separator="to"
                       @change="updateDateRange">
                   </el-date-picker>
-                </div>
-              </div>
-
-              <div class="inner-box">
-                <div class="input-name">
-                  Status
-                </div>
-                <div class="status">
-                  <el-select size="large" placeholder="select status">
-                    <el-option label="normal" value="" />
-                    <el-option label="lock" value="" />
-                    <el-option label="delete" value="" />
-                  </el-select>
                 </div>
               </div>
 
@@ -625,13 +631,13 @@ const backMacro = () => {
                   <textarea
                       v-model="selectedRowData.description"
                       name="reason"
-                      rows="6"
+                      rows="7"
                       style="width: 100%; padding: 10px; box-sizing: border-box;"
                       disabled
                   ></textarea>
                 </div>
               </div>
-              <div class="flex-fill" style="width: 50%; margin-left: 10px">
+              <div class="flex-fill" style="width: 50%; border-left: 1px solid #ccc; padding-left: 10px">
                 <div v-if="viewState === 'dealer'">
                   <div class="img-box" style="display: flex; justify-content: center">
                     <img :src=dealerInfo.image_url alt="dealer_image" style="width: 180px; height: 180px" >
@@ -654,10 +660,6 @@ const backMacro = () => {
               <textarea id="description" v-model="description" name="reason" rows="6"
                         style="width: 100%; padding: 10px; box-sizing: border-box;"
                         placeholder="Write a Description"></textarea>
-                  </div>
-                  <div class="btn-box" style=" padding: 5px 5px; border-bottom-right-radius: 0;  margin-bottom: 1rem">
-                    <button class="gray-btn green-btn" style="border-radius: 5px" @click="dealerSendMacro">
-                      <span class="text">Send</span></button>
                   </div>
                 </div>
                 <div v-if="viewState === 'player'">
@@ -732,25 +734,36 @@ const backMacro = () => {
                         style="width: 100%; padding: 10px; box-sizing: border-box;"
                         placeholder="Write a Description"></textarea>
                   </div>
-                  <div class="btn-box"
-                       style=" padding: 5px 5px; border-bottom-right-radius: 0;  margin-bottom: 1rem">
-                    <button class="gray-btn green-btn" style="border-radius: 5px" @click="playerSendMacro">
-                      <span class="text">Send</span></button>
-                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="modal-footer" style="padding: 5px">
-          <button v-if="viewState === 'initial'" class="gray-btn" style="width: 100%"
+        <div v-if="viewState === 'initial'" class="modal-footer" style="padding: 5px">
+          <button class="gray-btn" style="width: 100%"
                   data-bs-dismiss="modal">
             <span class="text">Close</span>
           </button>
-          <button v-else class="gray-btn" style="width: 100%"
-                  @click="backMacro">
-            <span class="text">Back</span>
-          </button>
+        </div>
+        <div v-else-if="viewState === 'dealer'" class="mf" style="display: flex; width: 100%">
+          <div class="modal-footer" style="width: 50%; padding: 5px 5px; border-right: 0.5px solid #999999; border-bottom-right-radius: 0;">
+            <button class="gray-btn" style="border-radius: 5px" @click="backMacro">
+              <span class="text">Back</span></button>
+          </div>
+          <div class="modal-footer" style="width: 50%; padding: 5px 5px" >
+            <button class="gray-btn green-btn" style="border-radius: 5px" @click="dealerSendMacro" data-bs-dismiss="modal">
+              <span class="text">send</span></button>
+          </div>
+        </div>
+        <div v-else class="mf" style="display: flex; width: 100%">
+          <div class="modal-footer" style="width: 50%; padding: 5px 5px; border-right: 0.5px solid #999999; border-bottom-right-radius: 0;">
+            <button class="gray-btn" style="border-radius: 5px" @click="backMacro">
+              <span class="text">Back</span></button>
+          </div>
+          <div class="modal-footer" style="width: 50%; padding: 5px 5px" >
+            <button class="gray-btn green-btn" style="border-radius: 5px" @click="playerSendMacro" data-bs-dismiss="modal">
+              <span class="text">send</span></button>
+          </div>
         </div>
       </div>
     </div>
@@ -777,7 +790,7 @@ const backMacro = () => {
           </div>
         </div>
         <div class="modal-footer" style="width: 100%; padding: 5px 5px" >
-          <button class="gray-btn" style="border-radius: 5px" data-bs-dismiss="modal">
+          <button class="gray-btn" style="border-radius: 5px" data-bs-dismiss="modal" @click="clearReport">
             <span class="text">close</span></button>
         </div>
       </div>
@@ -834,7 +847,7 @@ const backMacro = () => {
         </div>
         <div class="modal-footer" style="width: 100%; padding: 5px; border-right: 0.5px solid #999999; border-bottom-right-radius: 0;">
           <button class="gray-btn" style="border-radius: 5px" data-bs-dismiss="modal">
-            <span class="text">Cancel</span></button>
+            <span class="text">Close</span></button>
         </div>
       </div>
     </div>
@@ -874,11 +887,11 @@ const backMacro = () => {
         </div>
         <div class="mf" style="display: flex">
           <div class="modal-footer" style="width: 50%; padding: 5px; border-right: 0.5px solid #999999; border-bottom-right-radius: 0;">
-            <button class="gray-btn" style="border-radius: 5px" data-bs-dismiss="modal">
+            <button class="gray-btn" style="border-radius: 5px" @click="clearReport()" data-bs-dismiss="modal">
               <span class="text">close</span></button>
           </div>
           <div class="modal-footer" style="width: 50%; padding: 5px" >
-            <button class="gray-btn green-btn" style=" border-radius: 5px"  @click="dealerSendMacro" data-bs-dismiss="modal">
+            <button class="gray-btn green-btn" style=" border-radius: 5px"  @click="sendDealerReport" data-bs-dismiss="modal">
               <span class="text">Send</span></button>
           </div>
         </div>
@@ -891,7 +904,7 @@ const backMacro = () => {
       <div class="modal-content" style="border-radius: 5px;">
         <div class="body">
           <div class="modal-header" style="display: flex; justify-content: center; padding: 30px 0 20px 0;">
-            <h2 class="mb-0" style="color: #444444">Dealer Report</h2>
+            <h2 class="mb-0" style="color: #444444">Player Report</h2>
           </div>
           <div class="card-body">
             <div class="table-area">
@@ -959,11 +972,11 @@ const backMacro = () => {
         </div>
         <div class="mf" style="display: flex">
           <div class="modal-footer" style="width: 50%; padding: 5px; border-right: 0.5px solid #999999; border-bottom-right-radius: 0;">
-            <button class="gray-btn" style="border-radius: 5px" data-bs-dismiss="modal">
+            <button class="gray-btn" style="border-radius: 5px" @click="clearReport()" data-bs-dismiss="modal">
               <span class="text">close</span></button>
           </div>
           <div class="modal-footer" style="width: 50%; padding: 5px" >
-            <button class="gray-btn green-btn" style=" border-radius: 5px"  @click="playerSendMacro" data-bs-dismiss="modal">
+            <button class="gray-btn green-btn" style=" border-radius: 5px"  @click="sendPlayerReport" data-bs-dismiss="modal">
               <span class="text">Send</span></button>
           </div>
         </div>
@@ -974,13 +987,6 @@ const backMacro = () => {
 </template>
 
 <style scoped>
-.modal-transition-enter-active, .modal-transition-leave-active {
-  transition: opacity 0.5s, transform 0.5s;
-}
-.modal-transition-enter, .modal-transition-leave-to {
-  opacity: 0;
-  transform: translateX(50px);
-}
 .flex-fill {
   flex: 1;
 }
@@ -1007,6 +1013,12 @@ const backMacro = () => {
   padding: 0 10px 10px 10px;
   font-size: 30px;
   font-weight: bold;
+}
+
+.title-wrap{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   border-bottom: 2px solid whitesmoke;
 }
 
@@ -1139,6 +1151,70 @@ p {
 .el-pagination{
   float: right;
 }
+/* Button-CSS */
+.button-57 {
+  width: 7%;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #777777;
+  border-radius: 5px;
+  color: #444444;
+  display: inline-block;
+  font-size: 15px;
+  line-height: 15px;
+  padding: 15px 5px;
+  text-decoration: none;
+  cursor: pointer;
+  background: #fff;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
 
+.button-57 span:first-child {
+  position: relative;
+  transition: color 600ms cubic-bezier(0.48, 0, 0.12, 1);
+  z-index: 10;
+}
+
+.button-57 span:last-child {
+  color: white;
+  display: block;
+  position: absolute;
+  bottom: 0;
+  transition: all 500ms cubic-bezier(0.48, 0, 0.12, 1);
+  z-index: 100;
+  opacity: 0;
+  top: 55%;
+  left: 50%;
+  transform: translateY(225%) translateX(-90%);
+  height: 14px;
+  line-height: 13px;
+}
+
+.button-57:after {
+  content: "";
+  position: absolute;
+  bottom: -50%;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #444444;
+  transform-origin: bottom center;
+  transition: transform 600ms cubic-bezier(0.48, 0, 0.12, 1);
+  transform: skewY(9.3deg) scaleY(0);
+  z-index: 50;
+}
+
+.button-57:hover:after {
+  transform-origin: bottom center;
+  transform: skewY(9.3deg) scaleY(2);
+}
+
+.button-57:hover span:last-child {
+  transform: translateX(-50%) translateY(-100%);
+  opacity: 1;
+  transition: all 900ms cubic-bezier(0.48, 0, 0.12, 1);
+}
 
 </style>

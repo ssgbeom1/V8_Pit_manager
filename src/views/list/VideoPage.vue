@@ -1,5 +1,5 @@
 <script setup>
-import {onBeforeMount, onBeforeUnmount, onMounted, ref} from "vue";
+import {onBeforeMount, onBeforeUnmount, onMounted, ref, computed} from "vue";
 import { useStore } from "vuex";
 import 'video.js/dist/video-js.css'
 import axios from "axios";
@@ -9,8 +9,7 @@ import router from '@/router';
 import { StageEvents, Stage, SubscribeType } from "amazon-ivs-web-broadcast";
 import { ElOption, ElPagination, ElSelect, ElTable, ElTableColumn} from "element-plus";
 
-// const pitManagerId = computed(() => store.state.pitManagerInfo.pit_managers_id);
-const pitManagerId = ref("12") //예제 확인용
+const pitManagerId = computed(() => store.state.pitManagerInfo.pit_managers_id);
 
 //API응답 값 저장 (나중에 총 4개의 데이터를 받게되면 배열 형태로 변경해야함)
 const video_info= ref([])
@@ -223,8 +222,11 @@ const SendVideoDescription = async () => {
     if (response.data.status === 'success') {
       console.log('Video Description : ',response)
       gameTableIds.value = []
+      description.value = ''
     } else {
       console.error('Response error', response.data.message);
+      gameTableIds.value = []
+      description.value = ''
     }
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -256,8 +258,14 @@ const sendDealerReport = async () => {
     });
     if (response.data.status === 'success') {
       console.log('Report Sending Success')
+      gameTableIds.value = [];
+      description.value = '';
+      selectedReportType.value = '';
     } else {
       console.error('Response error', response.data.message);
+      gameTableIds.value = [];
+      description.value = '';
+      selectedReportType.value = '';
     }
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -291,8 +299,14 @@ const sendPlayerReport = async () => {
     });
     if (response.data.status === 'success') {
       console.log('Report Sending Success')
+      gameTableIds.value = [];
+      description.value = '';
+      selectedReportType.value = '';
     } else {
       console.error('Response error', response.data.message);
+      gameTableIds.value = [];
+      description.value = '';
+      selectedReportType.value = '';
     }
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -354,7 +368,7 @@ const CloseLiveMonitoring = async () => {
     if (response.data.status === 'success') {
       console.log("Close Success")
       gameId.value = '';
-      router.push({ name: 'selectMenuPage' });
+      router.push({ name: 'MainPage' });
     } else {
       console.error('Response error', response.data.message);
     }
@@ -363,10 +377,10 @@ const CloseLiveMonitoring = async () => {
   }
 }
 
-window.addEventListener('beforeunload', async (event) => {
-  event.preventDefault();
-  await CloseLiveMonitoring();
-});
+// window.addEventListener('beforeunload', async (event) => {
+//   event.preventDefault();
+//   await CloseLiveMonitoring();
+// });
 
 //Report Type List ---------------------------------------------------------------------------------------------------->
 const reportType = ref([])
@@ -575,6 +589,12 @@ onBeforeUnmount(() => {
   store.state.hideConfigButton = false;
   toggleDefaultLayout();
 });
+
+const clearReportData = () => {
+  gameTableIds.value = [];
+  description.value = '';
+  selectedReportType.value = '';
+}
 </script>
 
 <template>
@@ -898,11 +918,11 @@ onBeforeUnmount(() => {
         </div>
         <div class="mf" style="display: flex">
           <div class="modal-footer" style="width: 50%; padding: 5px; border-right: 0.5px solid #999999; border-bottom-right-radius: 0;">
-            <button class="gray-btn" style="border-radius: 5px" data-bs-dismiss="modal">
+            <button class="gray-btn" style="border-radius: 5px" @click="clearReportData()" data-bs-dismiss="modal">
               <span class="text">close</span></button>
           </div>
           <div class="modal-footer" style="width: 50%; padding: 5px" >
-            <button class="gray-btn blue-btn" style=" border-radius: 5px" data-bs-toggle="modal" data-bs-target="#videoDescModal">
+            <button class="gray-btn green-btn" style=" border-radius: 5px" data-bs-toggle="modal" data-bs-target="#videoDescModal">
               <span class="text">Description</span></button>
           </div>
         </div>
@@ -927,15 +947,14 @@ onBeforeUnmount(() => {
         </div>
         <div class="mf" style="display: flex">
           <div class="modal-footer" style="width: 50%; padding: 5px; border-right: 0.5px solid #999999; border-bottom-right-radius: 0;">
-            <button class="gray-btn" style="border-radius: 5px" data-bs-dismiss="modal">
+            <button class="gray-btn" style="border-radius: 5px" @click="clearReportData()" data-bs-dismiss="modal">
               <span class="text">close</span></button>
           </div>
           <div class="modal-footer" style="width: 50%; padding: 5px" >
-            <button class="gray-btn green-btn" style=" border-radius: 5px" @click="SendVideoDescription(), description = ''" data-bs-toggle="modal" data-bs-target="#playBackModal">
+            <button class="gray-btn green-btn" style=" border-radius: 5px" @click="SendVideoDescription()" data-bs-toggle="modal" data-bs-target="#playBackModal">
               <span class="text">Send</span></button>
           </div>
         </div>
-
       </div>
     </div>
   </div>
@@ -999,11 +1018,19 @@ onBeforeUnmount(() => {
             <div class="modal-header" style="display: flex; justify-content: center; padding: 10px 0 20px 0;">
               <h2 class="mb-0" style="color: #444444">Dealer</h2>
             </div>
-            <div class="card-body">
-              <!--              <div class="userImg">-->
-              <!--                <img :src=dealerInfo. alt="">-->
-              <!--              </div>-->
-              데이터 없음
+            <div class="card-body" style="display: flex; justify-content: center">
+              <div class="dealer-info">
+                <img src="../../assets/Dummyfolder/dealer_img.jpg" alt="dealer_img" style="width: 300px">
+                <div style="margin-top: 10px">
+                  Name : {{dealerInfo.dealer_name}}
+                </div>
+                <div>
+                  Win/Loss : {{dealerInfo.dealer_total_game_table_win_rate}}% / {{dealerInfo.dealer_total_game_table_loss_rate}}%
+                </div>
+                <div>
+                  Table : {{dealerInfo.dealer_total_game_table_count}}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1077,9 +1104,15 @@ onBeforeUnmount(() => {
             </div>
           </div>
         </div>
-        <div class="modal-footer" style="width: 100%; padding: 5px" >
-          <button class="gray-btn green-btn" style=" border-radius: 5px" @click="sendDealerReport(), description = '', playerName =''" data-bs-dismiss="modal">
-            <span class="text">Send</span></button>
+        <div class="mf" style="display: flex">
+          <div class="modal-footer" style="width: 50%; padding: 5px; border-right: 0.5px solid #999999; border-bottom-right-radius: 0;">
+            <button class="gray-btn" style="border-radius: 5px" @click="clearReportData()" data-bs-dismiss="modal">
+              <span class="text">close</span></button>
+          </div>
+          <div class="modal-footer" style="width: 50%; padding: 5px" >
+            <button class="gray-btn green-btn" style=" border-radius: 5px" @click="sendDealerReport(),playerName =''" >
+              <span class="text">Send</span></button>
+          </div>
         </div>
       </div>
     </div>
@@ -1117,9 +1150,7 @@ onBeforeUnmount(() => {
                     >
                     </el-input>
                   </div>
-
                 </div>
-
                 <el-table id="playerTable" :data="playerTableData" style="width: 100%">
                   <el-table-column prop="user_name" label="Player Name"></el-table-column>
                   <el-table-column prop="total_user_betting_count" label="Betting Count"></el-table-column>
@@ -1135,7 +1166,7 @@ onBeforeUnmount(() => {
                   </el-table-column>
                   <el-table-column label="ETC">
                     <template #default="{row}">
-                      <button class="btn btn-success " data-bs-toggle="modal" data-bs-target="#dealerPlayerReportModal" @click="setPlayerInfo(row.users_id, row.user_name),handleTableClick(playerIndex)">
+                      <button class="btn btn-success " data-bs-toggle="modal" data-bs-target="#PlayerReportModal" @click="setPlayerInfo(row.users_id, row.user_name),handleTableClick(playerIndex)">
                         Report
                       </button>
                     </template>
@@ -1160,7 +1191,7 @@ onBeforeUnmount(() => {
     </div>
   </div>
 
-  <div id="dealerPlayerReportModal" class="modal fade" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+  <div id="PlayerReportModal" class="modal fade" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-md  modal-dialog-centered">
       <div class="modal-content">
         <div class="body">
@@ -1213,9 +1244,15 @@ onBeforeUnmount(() => {
             </div>
           </div>
         </div>
-        <div class="modal-footer" style="width: 100%; padding: 5px" >
-          <button class="gray-btn green-btn" style=" border-radius: 5px" @click="sendPlayerReport(), description = '', playerName =''" data-bs-dismiss="modal">
-            <span class="text">Send</span></button>
+        <div class="mf" style="display: flex">
+          <div class="modal-footer" style="width: 50%; padding: 5px; border-right: 0.5px solid #999999; border-bottom-right-radius: 0;">
+            <button class="gray-btn" style="border-radius: 5px" @click="clearReportData()" data-bs-dismiss="modal">
+              <span class="text">close</span></button>
+          </div>
+          <div class="modal-footer" style="width: 50%; padding: 5px" >
+            <button class="gray-btn green-btn" style=" border-radius: 5px" @click="sendPlayerReport(),playerName =''" data-bs-dismiss="modal">
+              <span class="text">Send</span></button>
+          </div>
         </div>
       </div>
     </div>

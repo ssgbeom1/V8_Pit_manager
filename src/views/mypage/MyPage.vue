@@ -62,14 +62,14 @@ const changePassword = async () => {
     if (response.data.status === "success") {
       console.log(response);
       Swal.fire({
-        title: "비밀번호 변경 성공",
+        title: "Password change successful",
         icon: "success",
       })
 
     } else {
       Swal.fire({
         icon: 'error',
-        title: '비밀번호 변경 실패',
+        title: 'Password change failed',
         text: 'The account information is not vaild'
       })
       return;

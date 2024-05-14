@@ -7,6 +7,7 @@ import ReportListPage from "@/views/list/ReportListPage.vue";
 import SavedVideo from "@/views/list/SavedVideo.vue";
 import VideoPage from "@/views/list/VideoPage.vue";
 import MyPage from "@/views/mypage/MyPage.vue";
+import {computed} from "vue";
 
 
 const routes = [
@@ -33,32 +34,32 @@ const routes = [
   {
     path: "/mainPage/",
     name: "MainPage",
-    component: MainPage
+    component: MainPage,
+    meta: { requiresAuth: true }
   },
   {
     path: "/mainPage/reportListPage",
     name: "reportList",
-    component: ReportListPage
+    component: ReportListPage,
+    meta: { requiresAuth: true }
   },
   {
     path: "/mainPage/savedVideo",
     name: "savedVideo",
-    component: SavedVideo
-  },
-  {
-    path: "/mainPage/savedVideo",
-    name: "savedVideo",
-    component: SavedVideo
+    component: SavedVideo,
+    meta: { requiresAuth: true }
   },
   {
     path: "/mainPage/video",
     name: "videoPage",
-    component: VideoPage
+    component: VideoPage,
+    meta: { requiresAuth: true }
   },
   {
     path: "/mainPage/mypage",
     name: "mypage",
-    component: MyPage
+    component: MyPage,
+    meta: { requiresAuth: true }
   },
 
 
@@ -70,5 +71,19 @@ const router = createRouter({
   routes,
   linkActiveClass: "active"
 });
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    const accessToken = store.getters.getAccessToken;
+    if (!accessToken) {
+      next({ name: 'SignIn' });
+    } else {
+      next();
+    }
+  } else {
+    next();
+  }
+});
+
 
 export default router;

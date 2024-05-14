@@ -57,6 +57,10 @@ defineProps({
           <router-link :to="{name: 'mypage'}" class="dropdown-item">My Page</router-link>
         </li>
         <li>
+          <router-link :to="{name: 'MainPage'}" class="dropdown-item">Main Page</router-link>
+        </li>
+        <li><hr class="dropdown-divider divider2"></li>
+        <li style="display: flex; justify-content: center; align-items: center">
           <button class="gray-btn" @click="logout">
             Logout
           </button>
@@ -106,7 +110,7 @@ defineProps({
 
 }
 .gray-btn {
-  width: 100%;
+  width: 90%;
   height: 100%;
   background-color: #FFFFFF;
   border-width: 0;
@@ -115,14 +119,11 @@ defineProps({
   cursor: pointer;
   display: inline-block;
   font-size: 20px;
-  margin: 0;
   opacity: 1;
   outline: 0;
   padding: 0.2rem 1rem;
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
-  border-top: 1px solid #777777;
-  margin-top: 10px;
+  border-radius: 5px;
+  margin: auto auto 8px auto;
 }
 
 .gray-btn:hover{

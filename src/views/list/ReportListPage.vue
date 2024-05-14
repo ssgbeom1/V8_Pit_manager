@@ -1,5 +1,5 @@
 <script setup>
-import {onBeforeMount, onBeforeUnmount, onMounted, ref} from "vue";
+import {onBeforeMount, onBeforeUnmount, onMounted, ref, computed} from "vue";
 import {useStore} from "vuex";
 import axios from "axios";
 import security from "@/security";
@@ -9,6 +9,8 @@ import { format, parseISO } from 'date-fns';
 import {auto} from "@popperjs/core";
 import ArgonInput from "@/components/ArgonInput.vue";
 import * as XLSX from 'xlsx';
+import router from "@/router";
+
 const store = useStore();
 
 const toggleDefaultLayout = () => store.commit("toggleDefaultLayout");
@@ -38,7 +40,7 @@ const perPageOptions = [5, 10, 20, 30];
 //API 요청 통해 받아온 데이터 총 Row수 저장
 const total = ref(0);
 
-const pitManagerId = ref(1) // 추후 로그인 시 변경되도록 수정해야함
+const pitManagerId = computed(() => store.state.pitManagerInfo.pit_managers_id);
 
 // 데이터를 가져오는 함수
 const fetchData = async () => {
@@ -156,11 +158,20 @@ const sendUpdatedDescription = async () => {
       gameTableIds.value = [];
     } else {
       console.error('Response error', response.data.message);
+      description.value = '';
+      updateReason.value = '';
+      gameTableIds.value = [];
     }
   } catch (error) {
     console.error("Error fetching data:", error);
   }
 };
+
+const clearReport = () => {
+  description.value = '';
+  updateReason.value = '';
+  gameTableIds.value = [];
+}
 
 const confirmInfo = ref([])
 const fetchConfirmInfo = async () => {
@@ -427,23 +438,31 @@ onBeforeUnmount(() => {
 onMounted(() => {
   fetchData();
 });
+
+const toMainPage = () => router.push({ name: 'MainPage' });
 </script>
 
 <template>
   <main class="main-content mt-0">
     <div class="page-header min-vh-100" style="background-color:#222222;">
       <div class="container-xxl card">
-        <div class="title">
-          Report List
+        <div class="title-wrap">
+          <div class="title">
+            Report List
+          </div>
+          <button class="button-57" role="button" @click="toMainPage">
+            <span class="text">MainPage<i class="fa-solid fa-door-open" style="color: #777777; margin-left: 5px"></i></span>
+            <span><i class="fa-solid fa-arrow-right" style="font-size: 25px"></i></span>
+          </button>
         </div>
-        <div class="search-box row-12">
-          <div class="search-area col-11">
-            <div class="row-12 search-wrap">
-              <div class="date-search inner-box col-3">
+        <div class="search-box">
+          <div class="search-area">
+            <div class="search-wrap">
+              <div class="inner-box">
                 <div class="input-name">
                   Search Date
                 </div>
-                <div class="date-box">
+                <div class="date-search">
                   <el-date-picker
                       v-model="dateRange"
                       type="daterange"
@@ -458,22 +477,11 @@ onMounted(() => {
                 </div>
               </div>
 
-              <div class="status inner-box col-2">
-                <div class="input-name">
-                  Status
-                </div>
-                <el-select size="large" placeholder="select status">
-                  <el-option label="normal" value="" />
-                  <el-option label="lock" value="" />
-                  <el-option label="delete" value="" />
-                </el-select>
-              </div>
-
-              <div class="option-search inner-box col-12">
+              <div class=" inner-box">
                 <div class="input-name">
                   Option Search
                 </div>
-                <div>
+                <div class="option-search">
                   <el-input
                       v-model="search"
                       style="max-width: 500px"
@@ -483,17 +491,19 @@ onMounted(() => {
                   >
                     <template #prepend>
                       <el-select v-model="searchOption" placeholder="Search Option" size="large" style="width: 150px">
-                        <el-option label="1" value="" />
-                        <el-option label="2." value="" />
-                        <el-option label="3" value="" />
+                        <el-option label="None" value="" />
+                        <el-option label="Name" value="name" />
+                        <el-option label="Game" value="game" />
+                        <el-option label="Type" value="type" />
+                        <el-option label="Table" value="table" />
                       </el-select>
                     </template>
                   </el-input>
                 </div>
               </div>
             </div>
+            <button class="btn btn-primary" @click="fetchData()">Search</button>
           </div>
-          <button class="btn btn-primary col-1" @click="fetchData()">Search</button>
         </div>
 
         <div class="data-table-body">
@@ -601,7 +611,7 @@ onMounted(() => {
           </div>
           <div class="card-body ">
             <div class="img-box" style="margin-top: 20px">
-              <img :src=selectedRowData.dealer_image_url width="280px">
+              <img :src=selectedRowData.dealer_image_url width="280px" height="280px">
             </div>
             <div class="name">
               <p style="margin-top: 10px">Dealer Name : {{selectedRowData.dealer_name}}</p>
@@ -627,7 +637,7 @@ onMounted(() => {
           </div>
           <div class="card-body ">
             <div class="img-box" style="margin-top: 20px">
-              <img src="../../assets/Dummyfolder/dummy_img1.jpg" width="280px">
+              <img src="../../assets/Dummyfolder/dummy_img1.jpg" width="280px" height="280px">
             </div>
             <div class="name">
               <p style="margin-top: 10px">Player Name : {{selectedRowData.user_name}}</p>
@@ -780,7 +790,7 @@ onMounted(() => {
         </div>
         <div class="mf" style="display: flex">
           <div class="modal-footer" style="width: 50%; padding: 5px 5px; border-right: 0.5px solid #999999; border-bottom-right-radius: 0;">
-            <button class="gray-btn" style="border-radius: 5px" data-bs-dismiss="modal" @click="description=''">
+            <button class="gray-btn" style="border-radius: 5px" data-bs-dismiss="modal" @click="clearReport()">
               <span class="text">close</span></button>
           </div>
           <div class="modal-footer" style="width: 50%; padding: 5px 5px" >
@@ -984,7 +994,71 @@ onMounted(() => {
 
 <style scoped>
 @import 'element-plus/dist/index.css';
+/* Button-CSS */
+.button-57 {
+  width: 7%;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #777777;
+  border-radius: 5px;
+  color: #444444;
+  display: inline-block;
+  font-size: 15px;
+  line-height: 15px;
+  padding: 15px 10px;
+  text-decoration: none;
+  cursor: pointer;
+  background: #fff;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
 
+.button-57 span:first-child {
+  position: relative;
+  transition: color 600ms cubic-bezier(0.48, 0, 0.12, 1);
+  z-index: 10;
+}
+
+.button-57 span:last-child {
+  color: white;
+  display: block;
+  position: absolute;
+  bottom: 0;
+  transition: all 500ms cubic-bezier(0.48, 0, 0.12, 1);
+  z-index: 100;
+  opacity: 0;
+  top: 55%;
+  left: 50%;
+  transform: translateY(225%) translateX(-90%);
+  height: 14px;
+  line-height: 13px;
+}
+
+.button-57:after {
+  content: "";
+  position: absolute;
+  bottom: -50%;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #444444;
+  transform-origin: bottom center;
+  transition: transform 600ms cubic-bezier(0.48, 0, 0.12, 1);
+  transform: skewY(9.3deg) scaleY(0);
+  z-index: 50;
+}
+
+.button-57:hover:after {
+  transform-origin: bottom center;
+  transform: skewY(9.3deg) scaleY(2);
+}
+
+.button-57:hover span:last-child {
+  transform: translateX(-50%) translateY(-100%);
+  opacity: 1;
+  transition: all 900ms cubic-bezier(0.48, 0, 0.12, 1);
+}
 .data-table-body {
   padding: 20px;
   border-radius: 10px;
@@ -1008,6 +1082,12 @@ onMounted(() => {
   padding: 0 10px 10px 10px;
   font-size: 30px;
   font-weight: bold;
+}
+
+.title-wrap{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   border-bottom: 2px solid whitesmoke;
 }
 
@@ -1028,7 +1108,6 @@ onMounted(() => {
 
 .search-box {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   margin: 20px 0;
   padding: 20px 30px;
@@ -1041,8 +1120,14 @@ onMounted(() => {
   border-radius: 10px;
 }
 
+.search-area{
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
 .search-wrap {
   display: flex;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -1098,13 +1183,15 @@ p {
   outline: 0;
   padding: 1rem 1rem;
   border-radius: 10px ;
-
 }
 
 .gray-btn:hover{
   color: white;
   background-color: #777777;
   transition-duration: .5s;
+}
+.gray-btn:hover i {
+  color: white;
 }
 
 .blue-btn {

@@ -1,5 +1,5 @@
 <script setup>
-import {ref, onBeforeMount, onBeforeUnmount, watch, onMounted} from 'vue';
+import {ref, onBeforeMount, onBeforeUnmount, watch, onMounted,computed} from 'vue';
 import { useStore } from 'vuex';
 import axios from "axios";
 import security from "@/security";
@@ -30,8 +30,8 @@ const Page = ref(1);
 const length = ref(10);
 const searchOption =ref('')
 const search =ref('')
-// const pitManagerId = computed(() => store.state.pitManagerInfo.pit_managers_id);
-const pitManagerId = ref(12)
+const pitManagerId = computed(() => store.state.pitManagerInfo.pit_managers_id);
+// const pitManagerId = ref(12)
 
 //테이블 불러오기
 const fetchData = async () => {
