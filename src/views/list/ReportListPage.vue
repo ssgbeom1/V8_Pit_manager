@@ -52,7 +52,8 @@ const fetchData = async () => {
       length: length.value,
       searchOption: searchOption.value,
       search: search.value,
-      isConfirm : isConfirm.value
+      isConfirm : isConfirm.value,
+      pitManagerId : pitManagerId.value
     };
     const response = await axios.post('https://v8test.com/pit/manager/game/report/list', {
       data: security.encrypt(querystring.stringify(data)),
@@ -96,8 +97,6 @@ const fetchReportinfo = async (reportedId) => {
   }
 };
 
-const gameTableIds =ref([])
-const videoStoreData = ref([])
 const fetchVideoStoreList = async () => {
   try {
     const data = {
@@ -135,6 +134,14 @@ function removeTable(index) {
   console.log(gameTableIds.value)
 }
 
+const updateRowGameTableId = () => {
+  const attachGameTableIds = JSON.parse(selectedRowData.value.attach_game_tables_id);
+  gameTableIds.value = attachGameTableIds
+}
+
+const gameTableIds =ref([])
+
+const videoStoreData = ref([])
 const description = ref('')
 const updateReason = ref('')
 const sendUpdatedDescription = async () => {
@@ -398,7 +405,7 @@ const removeMacro = async (row) => {
 const updateMacro = async (row) => {
   await selectRowData(row);
   await fetchReportinfo(row.pit_manager_game_reports_id)
-  await fetchVideoStoreList()
+  await updateRowGameTableId()
 }
 
 const formatGameTableIds = (ids) => {
@@ -448,6 +455,7 @@ onBeforeUnmount(() => {
 
 onMounted(() => {
   fetchData();
+  fetchVideoStoreList();
 });
 
 const toMainPage = () => router.push({ name: 'MainPage' });
@@ -748,7 +756,7 @@ const toMainPage = () => router.push({ name: 'MainPage' });
 
   <div id="infoUpdateModal" class="modal fade" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-md  modal-dialog-centered">
-      <div v-if=(videoStoreData)  class="modal-content" style="border-radius: 5px;">
+      <div   class="modal-content" style="border-radius: 5px;">
         <div class="body">
           <div class="modal-header" style="display: flex; justify-content: center; padding: 30px 10px 20px 10px;">
             <h2 class="mb-0" style="color: #444444">Report</h2>
