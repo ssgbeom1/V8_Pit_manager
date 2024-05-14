@@ -401,7 +401,18 @@ const updateMacro = async (row) => {
   await fetchVideoStoreList()
 }
 
-
+const formatGameTableIds = (ids) => {
+  try {
+    const parsedIds = JSON.parse(ids);
+    if (Array.isArray(parsedIds)) {
+      return parsedIds.join(', ');
+    } else {
+      return ids;
+    }
+  } catch (error) {
+    return ids;
+  }
+};
 
 //Resize Error handling function
 const debounce = (fn, delay) => {
@@ -530,7 +541,11 @@ const toMainPage = () => router.push({ name: 'MainPage' });
             <el-table-column prop="pit_manager_game_reports_id" label="ID"/>
             <el-table-column prop="pit_manager_name" label="Name"/>
             <el-table-column prop="game_name" label="Game Name"/>
-            <el-table-column prop="games_id" label="Game Table"/>
+            <el-table-column label="Game Table">
+              <template #default="{ row }">
+                <span>{{ formatGameTableIds(row.attach_game_tables_id) }}</span>
+              </template>
+            </el-table-column>
             <el-table-column label="Type">
               <template #default="{row}">
                 <button v-if="row.reporter_target_type === 'DEALER'" class="btn btn-secondary dealerInfoBtn" @click="selectRowData(row)"  data-bs-toggle="modal" data-bs-target="#DealerModal">

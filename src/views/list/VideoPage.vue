@@ -1110,7 +1110,7 @@ const clearReportData = () => {
               <span class="text">close</span></button>
           </div>
           <div class="modal-footer" style="width: 50%; padding: 5px" >
-            <button class="gray-btn green-btn" style=" border-radius: 5px" @click="sendDealerReport(),playerName =''" >
+            <button class="gray-btn green-btn" style=" border-radius: 5px" @click="sendDealerReport(),playerName =''" data-bs-dismiss="modal" >
               <span class="text">Send</span></button>
           </div>
         </div>
