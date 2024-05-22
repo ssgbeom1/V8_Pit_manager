@@ -50,7 +50,7 @@ const fetchData = async () => {
       endDate: endDate.value,
       page: Page.value,
       length: length.value,
-      searchOption: searchOption.value,
+      searchoption: searchOption.value,
       search: search.value,
       isConfirm : isConfirm.value,
       pitManagerId : pitManagerId.value
@@ -58,6 +58,7 @@ const fetchData = async () => {
     const response = await axios.post('https://v8test.com/pit/manager/game/report/list', {
       data: security.encrypt(querystring.stringify(data)),
     });
+    console.log(data)
     if (response.data.status === 'success') {
       console.log(response.data);
       console.log(length.value);
