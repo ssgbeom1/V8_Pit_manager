@@ -1,5 +1,5 @@
 <script setup>
-import {ref, onBeforeMount, onBeforeUnmount, computed, onMounted, nextTick} from 'vue';
+import {ref, onBeforeMount, onBeforeUnmount, computed} from 'vue';
 import { useStore } from 'vuex';
 import axios from "axios";
 import security from "@/security";
@@ -19,16 +19,21 @@ const mfaDisplayValue = computed(() => {
 const CurrentPassword = ref('');
 const ChangePassword = ref('');
 const ChangePasswordConfirm = ref('');
-
 const accessToken = computed(() => store.state.accessToken);
 const pitManagerId = computed(() => store.state.pitManagerId);
+
+const clearPasswordChange = () =>{
+  CurrentPassword.value = '';
+  ChangePassword.value = '';
+  ChangePasswordConfirm.value = '';
+}
 
 const changePassword = async () => {
   if (!CurrentPassword.value.trim() || !ChangePassword.value.trim() || !ChangePasswordConfirm.value.trim()) {
     Swal.fire({
       icon: 'error',
       title: 'Oops...',
-      text: '모든 필드가 입력되지 않았습니다.',
+      text: 'All fields are not entered.',
     });
     return;
   }
@@ -36,7 +41,7 @@ const changePassword = async () => {
     Swal.fire({
       icon: 'error',
       title: 'Oops...',
-      text: '기존의 비밀번호와 변경할 비밀번호가 같습니다.',
+      text: 'The existing password and the password to be changed are the same.',
     });
     return;
   }
@@ -44,7 +49,7 @@ const changePassword = async () => {
     Swal.fire({
       icon: 'error',
       title: 'Oops...',
-      text: '변경할 비밀번호가 다릅니다.',
+      text: 'The password you want to change is different.',
     });
     return;
   }
@@ -64,7 +69,8 @@ const changePassword = async () => {
       Swal.fire({
         title: "Password change successful",
         icon: "success",
-      })
+      });
+      clearPasswordChange();
 
     } else {
       Swal.fire({
@@ -72,11 +78,13 @@ const changePassword = async () => {
         title: 'Password change failed',
         text: 'The account information is not vaild'
       })
+      clearPasswordChange();
       return;
     }
   } catch
       (error) {
     console.error("Login error:", error);
+    clearPasswordChange();
   }
 };
 
@@ -204,6 +212,12 @@ const MFAChange = async () => {
 // phone Edit =========================================================================================================>
 const changePhoneNum = ref('+8210')
 const verifyCode = ref('')
+
+const clearPhone = () => {
+  changePhoneNum.value = '+8210';
+  verifyCode.value = '';
+  store.dispatch('fetchPitManagerInfo');
+}
 const changePhone = async () => {
   try {
     const data ={
@@ -266,21 +280,23 @@ const changePhoneVerify = async () => {
     if (response.data.status === "success") {
       console.log(response);
       Swal.fire({
-        title: "사용자 이름 변경 성공",
+        title: "phone number change successful",
         icon: "success",
-      })
-      await store.dispatch('fetchPitManagerInfo');
+      });
+      clearPhone();
     } else {
       console.log(response)
       Swal.fire({
         icon: 'error',
-        title: '정보 변경 실패',
+        title: 'Information change failed',
         text: 'failed'
       })
+      clearPhone();
     }
   } catch
       (error) {
     console.error("Login error:", error);
+    clearPhone();
   }
 };
 
@@ -429,7 +445,7 @@ const toggleDefaultLayout = () => store.commit('toggleDefaultLayout');
         <div class="mf" style="display: flex">
           <div class="modal-footer"
                style="width: 50%; padding: 5px 5px; border-right: 0.5px solid #999999; border-bottom-right-radius: 0;">
-            <button class="gray-btn" style="border-radius: 5px" data-bs-dismiss="modal">
+            <button class="gray-btn" style="border-radius: 5px" data-bs-dismiss="modal" @click="clearPasswordChange">
               <span class="text">close</span></button>
           </div>
           <div class="modal-footer" style="width: 50%; padding: 5px 5px">
@@ -584,7 +600,7 @@ const toggleDefaultLayout = () => store.commit('toggleDefaultLayout');
         <div class="mf" style="display: flex">
           <div class="modal-footer"
                style="width: 50%; padding: 5px 5px; border-right: 0.5px solid #999999; border-bottom-right-radius: 0;">
-            <button class="gray-btn" style="border-radius: 5px" data-bs-dismiss="modal">
+            <button class="gray-btn" style="border-radius: 5px" data-bs-dismiss="modal" @click="clearPhone();">
               <span class="text">close</span></button>
           </div>
           <div class="modal-footer" style="width: 50%; padding: 5px 5px">
