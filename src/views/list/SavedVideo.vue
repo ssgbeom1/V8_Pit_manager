@@ -468,13 +468,13 @@ const toMainPage = () => router.push({ name: 'MainPage' });
           </button>
         </div>
         <div class="search-box">
-          <div class="search-area">
-            <div class="search-wrap">
-              <div class="inner-box">
-                <div class="input-name">
+          <div class="search-inner-row">
+            <div class="search-section">
+              <div class="date-search inner-box">
+                <div class="input-name mb-1">
                   Search Date
                 </div>
-                <div class="date-search">
+                <div class="date-box">
                   <el-date-picker
                       v-model="dateRange"
                       type="daterange"
@@ -489,31 +489,32 @@ const toMainPage = () => router.push({ name: 'MainPage' });
                 </div>
               </div>
 
-              <div class=" inner-box">
-                <div class="input-name">
+              <div class="option-search inner-box">
+                <div class="input-name mb-1">
                   Option Search
                 </div>
-                <div class="option-search">
-                  <el-input
-                      v-model="search"
-                      style="max-width: 500px"
-                      placeholder="Select Option Text"
-                      class="input-with-select"
-                      size="large"
-                  >
-                    <template #prepend>
-                      <el-select v-model="searchOption" placeholder="Search Option" size="large" style="width: 150px">
-                        <el-option label="None" value="" />
-                        <el-option label="Game" value="game" />
-                        <el-option label="Table" value="table" />
-                        <el-option label="Dealer" value="dealer" />
-                      </el-select>
-                    </template>
-                  </el-input>
-                </div>
+                <el-input
+                    v-model="search"
+                    :disabled="isSearchDisabled"
+                    style="max-width: 500px"
+                    placeholder="Select Option Text"
+                    class="input-with-select"
+                    size="large">
+                  <template #prepend>
+                    <el-select v-model="searchOption" placeholder="Search Option" size="large" style="width: 150px">
+                      <el-option label="None" value="" />
+                      <el-option label="Name" value="name" />
+                      <el-option label="Game" value="game" />
+                      <el-option label="Type" value="type" />
+                      <el-option label="Table" value="table" />
+                    </el-select>
+                  </template>
+                </el-input>
               </div>
             </div>
-            <button class="btn btn-primary" @click="fetchData()">Search</button>
+            <div class="btn-box">
+              <button class="btn btn-primary" @click="fetchData()">Search</button>
+            </div>
           </div>
         </div>
 
@@ -1035,43 +1036,34 @@ const toMainPage = () => router.push({ name: 'MainPage' });
   width: 90%;
 }
 
-.search-box {
+/*Search Area*/
+.search-section{
   display: flex;
-  align-items: center;
+}
+.inner-box{
+  margin-right: 1.8rem;
+}
+.search-box {
   margin: 20px 0;
   padding: 20px 30px;
   border-radius: 10px;
   box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
 }
 
-.card {
-  padding: 20px 30px;
-  border-radius: 10px;
-}
-.search-area{
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-}
-.search-wrap {
+.search-inner-row{
   display: flex;
   justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+}
+.btn-box {
+  display: flex;
+  justify-content: flex-end;
   align-items: center;
 }
 
-.inner-box {
-  margin-right: 10px;
-  width: 100%;
-}
-.status{
-  width: 13rem;
-}
-.option-search{
-  width: 20rem;
-}
-
-.input-name {
-  display: inline-block;
+.input-name{
+  color: black;
 }
 
 .btn-wrap {
