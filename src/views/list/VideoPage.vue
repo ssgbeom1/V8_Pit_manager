@@ -8,6 +8,7 @@ import querystring from "querystring";
 import router from '@/router';
 import { StageEvents, Stage, SubscribeType } from "amazon-ivs-web-broadcast";
 import { ElOption, ElPagination, ElSelect, ElTable, ElTableColumn} from "element-plus";
+import Swal from "sweetalert2";
 
 const pitManagerId = computed(() => store.state.pitManagerInfo.pit_managers_id);
 
@@ -29,7 +30,6 @@ const fetchData = async () => {
       data: security.encrypt(querystring.stringify(data)),
     });
     if (response.data.status === 'success') {
-      console.log('liveMonitoringList',response)
       video_info.value = response.data.message
     } else {
       console.error('Response error', response.data.message);
@@ -52,12 +52,11 @@ const fetchLiveVideoInfo = async () => {
     const data = {
       gameId: gameId.value
     }
-    console.log(gameId.value)
+
     const response = await axios.post("https://v8test.com/game/video/live/info", {
       data: security.encrypt(querystring.stringify(data)),
     });
     if (response.data.status === 'success') {
-      console.log('Live Video Info : ', response)
       DealerInfo.value = response.data.message.DealerInfo
       UserInfo.value = response.data.message.UserInfo
       GameTableInfo.value = response.data.message.GameTableInfo
@@ -99,12 +98,9 @@ const fetchLiveVideoPlayBackInfo = async () => {
       data: security.encrypt(querystring.stringify(data)),
     });
     if (response.data.status === 'success') {
-
       totalPages.value = Math.ceil(response.data.message.RecordTotalCount / parseInt(length.value));
       total.value = response.data.message.RecordTotalCount;
       tableData.value = response.data.message.Info;
-      // console.log(tableData.value[0])
-
     } else {
       console.error('Response error', response.data.message);
     }
@@ -131,12 +127,10 @@ function addTable(event) {
   if (!gameTableIds.value.includes(newTableId)) {
     gameTableIds.value.push(newTableId)
   }
-  console.log(gameTableIds.value)
 }
 
 function removeTable(index) {
   gameTableIds.value.splice(index, 1)
-  console.log(gameTableIds.value)
 }
 
 //Video View ---------------------------------------------------------------------------------------------------------->
@@ -152,7 +146,6 @@ const fetchVideoView = async ( TableId ) => {
       viewerId : pitManagerId.value,
       viewerType : 'pitManager'
     }
-    console.log(gameId.value)
     const response = await axios.post("https://v8test.com/game/table/video", {
       data: security.encrypt(querystring.stringify(data)),
     });
@@ -178,12 +171,11 @@ const fetchDealerInfo = async () => {
       // gameId: gameId.value,
       gameId : 19
     }
-    console.log(gameId.value)
+
     const response = await axios.post("https://v8test.com/game/dealer/info", {
       data: security.encrypt(querystring.stringify(data)),
     });
     if (response.data.status === 'success') {
-      console.log('DealerInfo', response)
       dealerInfo.value = response.data.message.Info
       dealerId.value = response.data.message.Info.dealers_id
     } else {
@@ -208,19 +200,16 @@ const description = ref('')
 const gameTableIds = ref([])
 const SendVideoDescription = async () => {
   gameTableIds.value = gameTableIds.value.map(id => parseInt(id));
-  console.log('send description : ', gameTableIds.value);
   try {
     const data = {
       pitManagerId : pitManagerId.value,
       description : description.value,
       gameTableIds : JSON.stringify(gameTableIds.value)
     }
-    console.log(gameId.value)
     const response = await axios.post("https://v8test.com/pit/manager/game/video/store", {
       data: security.encrypt(querystring.stringify(data)),
     });
     if (response.data.status === 'success') {
-      console.log('Video Description : ',response)
       gameTableIds.value = []
       description.value = ''
     } else {
@@ -241,7 +230,6 @@ const setReportTarget = (target) => {
 }
 const sendDealerReport = async () => {
   gameTableIds.value = gameTableIds.value.map(id => parseInt(id));
-  console.log(reportTarget.value,description.value,gameId.value,selectedReportType.value,pitManagerId.value,gameTableIds.value)
   try {
     const data = {
       reportTarget: reportTarget.value,
@@ -252,12 +240,15 @@ const sendDealerReport = async () => {
       gameTableIds : JSON.stringify(gameTableIds.value),
       reporterId: dealerId.value
     }
-    console.log(gameId.value)
+
     const response = await axios.post("https://v8test.com/pit/manager/game/report", {
       data: security.encrypt(querystring.stringify(data)),
     });
     if (response.data.status === 'success') {
-      console.log('Report Sending Success')
+      Swal.fire({
+        title: "Dealer Report Sending successful",
+        icon: "success",
+      });
       gameTableIds.value = [];
       description.value = '';
       selectedReportType.value = '';
@@ -269,6 +260,9 @@ const sendDealerReport = async () => {
     }
   } catch (error) {
     console.error("Error fetching data:", error);
+    gameTableIds.value = [];
+    description.value = '';
+    selectedReportType.value = '';
   }
 }
 
@@ -277,12 +271,9 @@ const playerName = ref('')
 const setPlayerInfo = (id, name) => {
   playerId.value = id
   playerName.value = name
-  console.log('store id Success',playerId.value)
-  console.log('store name Success',playerName.value)
 }
 const sendPlayerReport = async () => {
   gameTableIds.value = gameTableIds.value.map(id => parseInt(id));
-  console.log(reportTarget.value,description.value,gameId.value,selectedReportType.value,pitManagerId.value,gameTableIds.value)
   try {
     const data = {
       reportTarget: reportTarget.value,
@@ -293,12 +284,14 @@ const sendPlayerReport = async () => {
       gameTableIds : JSON.stringify(gameTableIds.value),
       reporterId: playerId.value
     }
-    console.log(gameId.value)
     const response = await axios.post("https://v8test.com/pit/manager/game/report", {
       data: security.encrypt(querystring.stringify(data)),
     });
     if (response.data.status === 'success') {
-      console.log('Report Sending Success')
+      Swal.fire({
+        title: "Player Report Sending successful",
+        icon: "success",
+      });
       gameTableIds.value = [];
       description.value = '';
       selectedReportType.value = '';
@@ -310,6 +303,9 @@ const sendPlayerReport = async () => {
     }
   } catch (error) {
     console.error("Error fetching data:", error);
+    gameTableIds.value = [];
+    description.value = '';
+    selectedReportType.value = '';
   }
 }
 
@@ -323,7 +319,6 @@ const setIndex = (index) =>{
 const playerTableData = ref([])
 const playerSearch =ref('')
 const fetchPlayerList = async () => {
-  console.log(Page.value,length.value,gameId.value)
   try {
     const data = {
       page : Page.value,
@@ -361,12 +356,10 @@ const CloseLiveMonitoring = async () => {
     const data = {
       pitManagerId: pitManagerId.value
     }
-    console.log(gameId.value)
     const response = await axios.post("https://v8test.com/pit/manager/game/live/monitoring/close", {
       data: security.encrypt(querystring.stringify(data)),
     });
     if (response.data.status === 'success') {
-      console.log("Close Success")
       gameId.value = '';
       router.push({ name: 'MainPage' });
     } else {
@@ -388,12 +381,10 @@ const selectedReportType = ref('')
 const fetchReportType = async () => {
   try {
     const data = {}
-    console.log(gameId.value)
     const response = await axios.post("https://v8test.com/pit/manager/game/report/type/list", {
       data: security.encrypt(querystring.stringify(data)),
     });
     if (response.data.status === 'success') {
-      console.log('ReportType : ',response)
       reportType.value= response.data.message.Info
     } else {
       console.error('Response error', response.data.message);
@@ -410,9 +401,7 @@ let stages = []; //여러개 생성해야 해서 수정
 let joining = []; //여러개 생성해야 해서 수정
 let connected = []; //여러개 생성해야 해서 수정
 async function joinStage(index) {
-  console.log("START : Video" + (index + 1));
   if (connected[index] || joining[index]) {
-    console.log("FAIL: Video" + (index + 1));
     return;
   }
 
@@ -460,7 +449,6 @@ async function joinStage(index) {
 }
 
 async function reJoinStage(index) {
-  console.log("START : Video" + (index + 1));
   if (connected[index] || joining[index]) {
     console.log("FAIL: Video" + (index + 1));
     return;

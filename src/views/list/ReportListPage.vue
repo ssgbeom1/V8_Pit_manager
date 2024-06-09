@@ -10,6 +10,7 @@ import {auto} from "@popperjs/core";
 import ArgonInput from "@/components/ArgonInput.vue";
 import * as XLSX from 'xlsx';
 import router from "@/router";
+import Swal from "sweetalert2";
 
 const store = useStore();
 
@@ -58,10 +59,7 @@ const fetchData = async () => {
     const response = await axios.post('https://v8test.com/pit/manager/game/report/list', {
       data: security.encrypt(querystring.stringify(data)),
     });
-    console.log(data)
     if (response.data.status === 'success') {
-      console.log(response.data);
-      console.log(length.value);
       totalPages.value = Math.ceil(response.data.message.RecordTotalCount / parseInt(length.value));
       total.value = response.data.message.RecordTotalCount;
       tableData.value = response.data.message.Info;
@@ -85,9 +83,7 @@ const fetchReportinfo = async (reportedId) => {
     const response = await axios.post('https://v8test.com/pit/manager/game/report/info', {
       data: security.encrypt(querystring.stringify(data)),
     });
-    console.log(data);
     if (response.data.status === 'success') {
-      console.log(response.data.message);
       reportData.value = response.data.message.Info;
       reportTable.value= JSON.parse(response.data.message.Info.game_tables_ids)
     } else {
@@ -113,7 +109,6 @@ const fetchVideoStoreList = async () => {
       data: security.encrypt(querystring.stringify(data)),
     });
     if (response.data.status === 'success') {
-      console.log('store', response.data.message);
       videoStoreData.value = response.data.message.Info;
     } else {
       console.error('Response error', response.data.message);
@@ -127,12 +122,10 @@ function addTable(event) {
   if (!gameTableIds.value.includes(newTableId)) {
     gameTableIds.value.push(newTableId)
   }
-  console.log(gameTableIds.value)
 }
 
 function removeTable(index) {
   gameTableIds.value.splice(index, 1)
-  console.log(gameTableIds.value)
 }
 
 const updateRowGameTableId = () => {
@@ -158,20 +151,19 @@ const sendUpdatedDescription = async () => {
     const response = await axios.put('https://v8test.com/pit/manager/game/report', {
       data: security.encrypt(querystring.stringify(data)),
     });
-    console.log(data)
     if (response.data.status === 'success') {
-      console.log("Report update success");
-      description.value = '';
-      updateReason.value = '';
-      gameTableIds.value = [];
+      Swal.fire({
+        title: "Report Update successful",
+        icon: "success",
+      });
+      clearReport();
     } else {
       console.error('Response error', response.data.message);
-      description.value = '';
-      updateReason.value = '';
-      gameTableIds.value = [];
+      clearReport();
     }
   } catch (error) {
     console.error("Error fetching data:", error);
+    clearReport();
   }
 };
 
@@ -190,7 +182,6 @@ const fetchConfirmInfo = async () => {
     const response = await axios.put('https://v8test.com/pit/manager/game/report', {
       data: security.encrypt(querystring.stringify(data)),
     });
-    console.log(data)
     if (response.data.status === 'success') {
       confirmInfo.value = response.data.message.Info
     } else {
@@ -210,7 +201,6 @@ const fetchReportType = async () => {
       data: security.encrypt(querystring.stringify(data)),
     });
     if (response.data.status === 'success') {
-      console.log('ReportType : ',response)
       reportType.value= response.data.message.Info
     } else {
       console.error('Response error', response.data.message);
@@ -232,15 +222,19 @@ const deleteReport = async () => {
       data: security.encrypt(querystring.stringify(data)),
     });
     if (response.data.status === 'success') {
-      console.log('delete success')
-      console.log(response)
+      Swal.fire({
+        title: "Report Delete successful",
+        icon: "success",
+      });
       description.value = ''
       fetchData()
     } else {
       console.error('Response error', response.data.message);
+      description.value = ''
     }
   } catch (error) {
     console.error("Error fetching data:", error);
+    description.value = ''
   }
 }
 
@@ -261,7 +255,6 @@ const fetchvideoList = async () => {
         ...response.data.message.Info,
         game_table_id: id,
       }));
-      console.log('후',videoListTableData.value)
     } else {
       console.error('Response error', response.data.message);
     }
@@ -309,13 +302,10 @@ const indexMethod = (index) => {
 //row 저장 메소드
 const selectRowData = (rowData) => {
   selectedRowData.value = rowData;
-  console.log("Selected data:", selectedRowData.value);
 };
 
 // 선택한 페이지 보여주는 함수
 const handlePageChange = (val) => {
-  console.log(`current page: ${val}`)
-  console.log(`current page: `, val)
   Page.value = val;
   fetchData()
 }
@@ -333,9 +323,6 @@ function updateDateRange(value) {
 
     startDate.value = startDateValue.toISOString().substring(0, 10);
     endDate.value = endDateValue.toISOString().substring(0, 10);
-
-    console.log('Start :' + startDate.value);
-    console.log('End :' + endDate.value);
   } else {
     startDate.value = null;
     endDate.value = null;
@@ -372,10 +359,20 @@ const exportToExcel = async () => {
     });
 
     if (response.data.status === 'success') {
-      const worksheet = XLSX.utils.json_to_sheet(response.data.message.Info);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Report");
-      XLSX.writeFile(workbook, "pit_manager_game_report_list.xlsx");
+      const info = response.data.message.Info;
+      if (!info || info.length === 0) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'There is no data available for export',
+        });
+        return;
+      } else {
+        const worksheet = XLSX.utils.json_to_sheet(info);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Report");
+        XLSX.writeFile(workbook, "pit_manager_game_report_list.xlsx");
+      }
     } else {
       console.error('Excel export error:', response.data.message);
     }

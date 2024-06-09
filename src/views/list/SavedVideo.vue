@@ -9,6 +9,7 @@ import { format, parseISO } from 'date-fns';
 import {auto} from "@popperjs/core";
 import * as XLSX from 'xlsx';
 import router from "@/router";
+import Swal from "sweetalert2";
 const store = useStore();
 
 const toggleDefaultLayout = () => store.commit("toggleDefaultLayout");
@@ -55,7 +56,6 @@ const fetchData = async () => {
       data: security.encrypt(querystring.stringify(data)),
     });
     if (response.data.status === 'success') {
-      console.log(response.data.message)
       totalPages.value = Math.ceil(response.data.message.RecordTotalCount / parseInt(length.value));
       total.value = response.data.message.RecordTotalCount;
       tableData.value = response.data.message.Info;
@@ -77,7 +77,6 @@ const fetchListvideo = async () => {
       viewerId: pitManagerId.value,
       viewerType: "pit_manager"
     }
-    console.log('video fetching data : ', data)
     const response = await axios.post("https://v8test.com/game/table/video", {
       data: security.encrypt(querystring.stringify(data)),
     });
@@ -126,7 +125,6 @@ const fetchReportType = async () => {
       data: security.encrypt(querystring.stringify(data)),
     });
     if (response.data.status === 'success') {
-      console.log('ReportType : ',response)
       reportType.value= response.data.message.Info
     } else {
       console.error('Response error', response.data.message);
@@ -156,12 +154,15 @@ const sendDealerReport = async () => {
       gameTableIds : JSON.stringify(gameTableId.value),
       reporterId: selectedRowData.value.dealers_id
     }
-    console.log(selectedRowData.value.games_id)
+
     const response = await axios.post("https://v8test.com/pit/manager/game/report", {
       data: security.encrypt(querystring.stringify(data)),
     });
     if (response.data.status === 'success') {
-      console.log('Dealer Report Sending Success');
+      Swal.fire({
+        title: "Dealer Report Sending successful",
+        icon: "success",
+      });
       description.value = ''
       selectedReportType.value = ''
     } else {
@@ -171,6 +172,8 @@ const sendDealerReport = async () => {
     }
   } catch (error) {
     console.error("Error fetching data:", error);
+    description.value = ''
+    selectedReportType.value = ''
   }
 }
 
@@ -179,8 +182,6 @@ const playerName = ref('')
 const setPlayerInfo = (id, name) => {
   playerId.value = id
   playerName.value = name
-  console.log('store id Success',playerId.value)
-  console.log('store name Success',playerName.value)
 }
 
 const sendPlayerReport = async () => {
@@ -195,12 +196,14 @@ const sendPlayerReport = async () => {
       gameTableIds : JSON.stringify(gameTableId.value),
       reporterId: playerId.value
     }
-    console.log(data)
     const response = await axios.post("https://v8test.com/pit/manager/game/report", {
       data: security.encrypt(querystring.stringify(data)),
     });
     if (response.data.status === 'success') {
-      console.log('Player Report Sending Success')
+      Swal.fire({
+        title: "Player Report Sending successful",
+        icon: "success",
+      });
       description.value = ''
       selectedReportType.value = ''
       playerName.value =''
@@ -212,6 +215,9 @@ const sendPlayerReport = async () => {
     }
   } catch (error) {
     console.error("Error fetching data:", error);
+    description.value = ''
+    selectedReportType.value = ''
+    playerName.value =''
   }
 }
 
@@ -255,7 +261,10 @@ const deleteReport = async () => {
       data: security.encrypt(querystring.stringify(data)),
     });
     if (response.data.status === 'success') {
-      console.log('Video delete success')
+      Swal.fire({
+        title: "Video Delete successful",
+        icon: "success",
+      });
       fetchData()
     } else {
       console.error('Response error', response.data.message);
@@ -274,14 +283,11 @@ const indexMethod = (index) => {
 // 버튼 클릭시 해당 Row 데이터 불러와 저장하는 메소드
 const selectRowData = (rowData) => {
   selectedRowData.value = rowData;
-  console.log("Selected data:", selectedRowData.value);
 };
 
 
 // 선택한 페이지 보여주는 함수
 const handlePageChange = (val) => {
-  console.log(`current page: ${val}`)
-  console.log(`current page: `, val)
   Page.value = val;
   fetchData()
 }
@@ -299,9 +305,6 @@ function updateDateRange(value) {
 
     startDate.value = startDateValue.toISOString().substring(0, 10);
     endDate.value = endDateValue.toISOString().substring(0, 10);
-
-    console.log('Start :' + startDate.value);
-    console.log('End :' + endDate.value);
   } else {
     startDate.value = null;
     endDate.value = null;
@@ -316,7 +319,6 @@ const formatDate = (dateStr) => {
   try {
     return format(parseISO(dateStr), 'yyyy-MM-dd HH:mm:ss');
   } catch (error) {
-    console.error("Error formatting date:", error);
     return "Invalid date";
   }
 };
@@ -339,10 +341,20 @@ const exportToExcel = async () => {
     });
 
     if (response.data.status === 'success') {
-      const worksheet = XLSX.utils.json_to_sheet(response.data.message.Info);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Report");
-      XLSX.writeFile(workbook, "pit_manager_saved_video_list.xlsx");
+      const info = response.data.message.Info;
+      if (!info || info.length === 0) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'There is no data available for export',
+        });
+        return;
+      } else {
+        const worksheet = XLSX.utils.json_to_sheet(info);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Report");
+        XLSX.writeFile(workbook, "pit_manager_saved_video_list.xlsx");
+      }
     } else {
       console.error('Excel export error:', response.data.message);
     }
