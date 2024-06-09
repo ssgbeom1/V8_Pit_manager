@@ -54,12 +54,8 @@ const fetchData = async () => {
     const response = await axios.post('https://v8test.com/pit/manager/game/video/store/list', {
       data: security.encrypt(querystring.stringify(data)),
     });
-
-    console.log(data);
-
     if (response.data.status === 'success') {
-      console.log(response.data);
-      console.log(length.value);
+      console.log(response.data.message)
       totalPages.value = Math.ceil(response.data.message.RecordTotalCount / parseInt(length.value));
       total.value = response.data.message.RecordTotalCount;
       tableData.value = response.data.message.Info;
@@ -547,6 +543,7 @@ const toMainPage = () => router.push({ name: 'MainPage' });
             </el-table-column>
             <el-table-column prop="game_name" label="Game Name"/>
             <el-table-column prop="dealer_name" label="Dealer"/>
+            <el-table-column prop="game_tables_id" label="Game Table"/>
             <el-table-column label="Table Start Time">
               <template #default="{ row }">
                 {{ formatDate(row.game_table_start_reg_datetime) }}
