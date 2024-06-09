@@ -503,10 +503,9 @@ const toMainPage = () => router.push({ name: 'MainPage' });
                   <template #prepend>
                     <el-select v-model="searchOption" placeholder="Search Option" size="large" style="width: 150px">
                       <el-option label="None" value="" />
-                      <el-option label="Name" value="name" />
                       <el-option label="Game" value="game" />
-                      <el-option label="Type" value="type" />
                       <el-option label="Table" value="table" />
+                      <el-option label="dealer" value="dealer" />
                     </el-select>
                   </template>
                 </el-input>
