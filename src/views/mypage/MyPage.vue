@@ -123,7 +123,7 @@ const nameChange = async () => {
 };
 
 // email Edit =========================================================================================================>
-const changeEmail = ref('')
+const changeEmail = ref(pitManagerInfo.value.email)
 const emailChange = async () => {
   try {
     const data ={
@@ -138,14 +138,12 @@ const emailChange = async () => {
       data: security.encrypt(querystring.stringify(data)),
     });
     if (response.data.status === "success") {
-      console.log(response);
       Swal.fire({
         title: "User email change successful",
         icon: "success",
       })
       await store.dispatch('fetchPitManagerInfo');
     } else {
-      console.log(response)
       Swal.fire({
         icon: 'error',
         title: 'Information change failed',

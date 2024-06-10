@@ -1,5 +1,5 @@
 <script setup>
-import {onBeforeMount, onBeforeUnmount, onMounted, ref, computed} from "vue";
+import {onBeforeMount, onBeforeUnmount, onMounted, ref, computed, watch} from "vue";
 import {useStore} from "vuex";
 import axios from "axios";
 import security from "@/security";
@@ -460,6 +460,13 @@ const clearReport = () => {
 }
 
 const toMainPage = () => router.push({ name: 'MainPage' });
+
+/*Search option*/
+watch(searchOption, () => {
+  search.value = '';
+});
+
+const isSearchDisabled = computed(() => searchOption.value === 'none');
 </script>
 
 <template>
@@ -510,7 +517,7 @@ const toMainPage = () => router.push({ name: 'MainPage' });
                     size="large">
                   <template #prepend>
                     <el-select v-model="searchOption" placeholder="Search Option" size="large" style="width: 150px">
-                      <el-option label="None" value="" />
+                      <el-option label="All" value="none"/>
                       <el-option label="Game" value="game" />
                       <el-option label="Table" value="table" />
                       <el-option label="dealer" value="dealer" />
