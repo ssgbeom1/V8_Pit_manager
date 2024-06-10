@@ -201,7 +201,7 @@ const fetchReportType = async () => {
       data: security.encrypt(querystring.stringify(data)),
     });
     if (response.data.status === 'success') {
-      reportType.value= response.data.message.Info
+      reportType.value = response.data.message.Info
     } else {
       console.error('Response error', response.data.message);
     }
@@ -311,7 +311,6 @@ const handlePageChange = (val) => {
 }
 
 
-
 // Date Range Picker
 const dateRange = ref([null, null]);
 
@@ -350,7 +349,7 @@ const exportToExcel = async () => {
     length: 9999999,
     searchOption: searchOption.value,
     search: search.value,
-    isConfirm : isConfirm.value
+    isConfirm: isConfirm.value
   };
 
   try {
@@ -432,7 +431,7 @@ const debounce = (fn, delay) => {
   }
 }
 const _ResizeObserver = window.ResizeObserver;
-window.ResizeObserver = class ResizeObserver extends _ResizeObserver{
+window.ResizeObserver = class ResizeObserver extends _ResizeObserver {
   constructor(callback) {
     callback = debounce(callback, 16);
     super(callback);
@@ -456,7 +455,7 @@ onMounted(() => {
   fetchVideoStoreList();
 });
 
-const toMainPage = () => router.push({ name: 'MainPage' });
+const toMainPage = () => router.push({name: 'MainPage'});
 </script>
 
 <template>
@@ -468,7 +467,8 @@ const toMainPage = () => router.push({ name: 'MainPage' });
             Report List
           </div>
           <button class="button-57" role="button" @click="toMainPage">
-            <span class="text">MainPage<i class="fa-solid fa-door-open" style="color: #777777; margin-left: 5px"></i></span>
+            <span class="text">MainPage<i class="fa-solid fa-door-open"
+                                          style="color: #777777; margin-left: 5px"></i></span>
             <span><i class="fa-solid fa-arrow-right" style="font-size: 25px"></i></span>
           </button>
         </div>
@@ -507,11 +507,11 @@ const toMainPage = () => router.push({ name: 'MainPage' });
                     size="large">
                   <template #prepend>
                     <el-select v-model="searchOption" placeholder="Search Option" size="large" style="width: 150px">
-                      <el-option label="None" value="" />
-                      <el-option label="Name" value="name" />
-                      <el-option label="Game" value="game" />
-                      <el-option label="Type" value="type" />
-                      <el-option label="Table" value="table" />
+                      <el-option label="None" value=""/>
+                      <el-option label="Name" value="name"/>
+                      <el-option label="Game" value="game"/>
+                      <el-option label="Type" value="type"/>
+                      <el-option label="Table" value="table"/>
                     </el-select>
                   </template>
                 </el-input>
@@ -554,17 +554,20 @@ const toMainPage = () => router.push({ name: 'MainPage' });
             </el-table-column>
             <el-table-column label="Type">
               <template #default="{row}">
-                <button v-if="row.reporter_target_type === 'DEALER'" class="btn btn-secondary dealerInfoBtn" @click="selectRowData(row)"  data-bs-toggle="modal" data-bs-target="#DealerModal">
+                <button v-if="row.reporter_target_type === 'DEALER'" class="btn btn-secondary dealerInfoBtn"
+                        @click="selectRowData(row)" data-bs-toggle="modal" data-bs-target="#DealerModal">
                   Dealer
                 </button>
-                <button v-else-if="row.reporter_target_type === 'USER'" class="btn btn-secondary userInfoBtn" @click="selectRowData(row)" data-bs-toggle="modal" data-bs-target="#PlayerModal">
+                <button v-else-if="row.reporter_target_type === 'USER'" class="btn btn-secondary userInfoBtn"
+                        @click="selectRowData(row)" data-bs-toggle="modal" data-bs-target="#PlayerModal">
                   Player
                 </button>
               </template>
             </el-table-column>
             <el-table-column label="Description">
               <template #default="{row}">
-                <button class="btn btn-success descBtn" @click="fetchReportinfo(row.pit_manager_game_reports_id)" data-bs-toggle="modal" data-bs-target="#infoModal">
+                <button class="btn btn-success descBtn" @click="fetchReportinfo(row.pit_manager_game_reports_id)"
+                        data-bs-toggle="modal" data-bs-target="#infoModal">
                   Detail
                 </button>
               </template>
@@ -577,7 +580,8 @@ const toMainPage = () => router.push({ name: 'MainPage' });
             <el-table-column prop="studio_manager_name" label="Studio Manager"/>
             <el-table-column label="Video">
               <template #default="{row}">
-                <button class="btn btn-success viewBtn" @click="viewMacro(row)" data-bs-toggle="modal" data-bs-target="#videoViewModal">
+                <button class="btn btn-success viewBtn" @click="viewMacro(row)" data-bs-toggle="modal"
+                        data-bs-target="#videoViewModal">
                   View
                 </button>
               </template>
@@ -589,14 +593,17 @@ const toMainPage = () => router.push({ name: 'MainPage' });
             </el-table-column>
             <el-table-column label="ETC">
               <template #default="{row}">
-                <button v-if="row.is_confirm === 1" class="btn btn-success confirmBtn" @click="confirmMacro(row)" data-bs-toggle="modal" data-bs-target="#confirmModal">
+                <button v-if="row.is_confirm === 1" class="btn btn-success confirmBtn" @click="confirmMacro(row)"
+                        data-bs-toggle="modal" data-bs-target="#confirmModal">
                   Confirm
                 </button>
                 <div v-else>
-                  <button class="btn btn-danger removeBtn" @click="removeMacro(row)" data-bs-toggle="modal" data-bs-target="#DeleteModal">
+                  <button class="btn btn-danger removeBtn" @click="removeMacro(row)" data-bs-toggle="modal"
+                          data-bs-target="#DeleteModal">
                     Remove
                   </button>
-                  <button class="btn btn-primary updateBtn" @click="updateMacro(row)" data-bs-toggle="modal" data-bs-target="#infoUpdateModal" style="margin-left: 5px;">
+                  <button class="btn btn-primary updateBtn" @click="updateMacro(row)" data-bs-toggle="modal"
+                          data-bs-target="#infoUpdateModal" style="margin-left: 5px;">
                     Update
                   </button>
                 </div>
@@ -635,14 +642,14 @@ const toMainPage = () => router.push({ name: 'MainPage' });
               <img :src=selectedRowData.dealer_image_url width="280px" height="280px">
             </div>
             <div class="name">
-              <p style="margin-top: 10px">Dealer Name : {{selectedRowData.dealer_name}}</p>
+              <p style="margin-top: 10px">Dealer Name : {{ selectedRowData.dealer_name }}</p>
             </div>
             <div class="game-time">
-              <p style="margin-top: 10px">Game Start Time : {{formatDate(selectedRowData.dealer_reg_datetime)}}</p>
+              <p style="margin-top: 10px">Game Start Time : {{ formatDate(selectedRowData.dealer_reg_datetime) }}</p>
             </div>
           </div>
         </div>
-        <div class="modal-footer" style="padding: 5px" >
+        <div class="modal-footer" style="padding: 5px">
           <button class="gray-btn" style="width: 100%" data-bs-dismiss="modal"><span class="text">close</span></button>
         </div>
       </div>
@@ -661,14 +668,14 @@ const toMainPage = () => router.push({ name: 'MainPage' });
               <img src="../../assets/Dummyfolder/dummy_img1.jpg" width="280px" height="280px">
             </div>
             <div class="name">
-              <p style="margin-top: 10px">Player Name : {{selectedRowData.user_name}}</p>
+              <p style="margin-top: 10px">Player Name : {{ selectedRowData.user_name }}</p>
             </div>
             <div class="game-time">
-              <p style="margin-top: 10px">Game Start Time : {{formatDate(selectedRowData.user_reg_datetime)}}</p>
+              <p style="margin-top: 10px">Game Start Time : {{ formatDate(selectedRowData.user_reg_datetime) }}</p>
             </div>
           </div>
         </div>
-        <div class="modal-footer" style="padding: 5px" >
+        <div class="modal-footer" style="padding: 5px">
           <button class="gray-btn" style="width: 100%" data-bs-dismiss="modal"><span class="text">close</span></button>
         </div>
       </div>
@@ -686,14 +693,14 @@ const toMainPage = () => router.push({ name: 'MainPage' });
           <div class="card-body ">
             <div class="text-area">
               <div class="type-info">
-                Type : {{reportData.report_type}}
+                Type : {{ reportData.report_type }}
               </div>
               <div class="name-date-wrap" style="display: flex; justify-content: space-between; align-items: center">
                 <div class="name-info">
-                  Name : {{reportData.person_report_name}}
+                  Name : {{ reportData.person_report_name }}
                 </div>
                 <div class="date-info">
-                  {{formatDate(reportData.reg_datetime)}}
+                  {{ formatDate(reportData.reg_datetime) }}
                 </div>
               </div>
             </div>
@@ -739,12 +746,14 @@ const toMainPage = () => router.push({ name: 'MainPage' });
           </div>
         </div>
         <div class="mf" style="display: flex">
-          <div class="modal-footer" style="width: 50%; padding: 5px; border-right: 0.5px solid #999999; border-bottom-right-radius: 0;">
+          <div class="modal-footer"
+               style="width: 50%; padding: 5px; border-right: 0.5px solid #999999; border-bottom-right-radius: 0;">
             <button class="gray-btn" style="border-radius: 5px" data-bs-dismiss="modal">
               <span class="text">close</span></button>
           </div>
-          <div class="modal-footer" style="width: 50%; padding: 5px" >
-            <button class="gray-btn blue-btn" style=" border-radius: 5px" data-bs-toggle="modal" data-bs-target="#infoUpdateModal" @click="fetchVideoStoreList">
+          <div class="modal-footer" style="width: 50%; padding: 5px">
+            <button class="gray-btn blue-btn" style=" border-radius: 5px" data-bs-toggle="modal"
+                    data-bs-target="#infoUpdateModal" @click="fetchVideoStoreList">
               <span class="text">Update</span></button>
           </div>
         </div>
@@ -754,7 +763,7 @@ const toMainPage = () => router.push({ name: 'MainPage' });
 
   <div id="infoUpdateModal" class="modal fade" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-md  modal-dialog-centered">
-      <div   class="modal-content" style="border-radius: 5px;">
+      <div class="modal-content" style="border-radius: 5px;">
         <div class="body">
           <div class="modal-header" style="display: flex; justify-content: center; padding: 30px 10px 20px 10px;">
             <h2 class="mb-0" style="color: #444444">Report</h2>
@@ -762,19 +771,20 @@ const toMainPage = () => router.push({ name: 'MainPage' });
           <div class="card-body">
             <div class="text-area">
               <div class="type-info">
-                Type : {{reportData.report_type}}
+                Type : {{ reportData.report_type }}
               </div>
               <div class="name-date-wrap" style="display: flex; justify-content: space-between; align-items: center">
                 <div class="name-info">
-                  Name : {{reportData.person_report_name}}
+                  Name : {{ reportData.person_report_name }}
                 </div>
                 <div class="date-info">
-                  {{formatDate(reportData.reg_datetime)}}
+                  {{ formatDate(reportData.reg_datetime) }}
                 </div>
               </div>
             </div>
             <div class="report-desc-area">
-              <argon-input v-model="reportData.report_type" type="text" placeholder="Report Type" is-disabled=true style="margin-top: 10px"></argon-input>
+              <argon-input v-model="reportData.report_type" type="text" placeholder="Report Type" is-disabled=true
+                           style="margin-top: 10px"></argon-input>
               <textarea id="description" v-model="description" name="reason" rows="10"
                         style="width: 100%; padding: 10px; box-sizing: border-box;"
                         placeholder="Write a Description"></textarea>
@@ -810,12 +820,14 @@ const toMainPage = () => router.push({ name: 'MainPage' });
           </div>
         </div>
         <div class="mf" style="display: flex">
-          <div class="modal-footer" style="width: 50%; padding: 5px 5px; border-right: 0.5px solid #999999; border-bottom-right-radius: 0;">
+          <div class="modal-footer"
+               style="width: 50%; padding: 5px 5px; border-right: 0.5px solid #999999; border-bottom-right-radius: 0;">
             <button class="gray-btn" style="border-radius: 5px" data-bs-dismiss="modal" @click="clearReport()">
               <span class="text">close</span></button>
           </div>
-          <div class="modal-footer" style="width: 50%; padding: 5px 5px" >
-            <button class="gray-btn green-btn" style="border-radius: 5px" @click="sendUpdatedDescription" data-bs-dismiss="modal">
+          <div class="modal-footer" style="width: 50%; padding: 5px 5px">
+            <button class="gray-btn green-btn" style="border-radius: 5px" @click="sendUpdatedDescription"
+                    data-bs-dismiss="modal">
               <span class="text">Send</span></button>
           </div>
         </div>
@@ -837,12 +849,13 @@ const toMainPage = () => router.push({ name: 'MainPage' });
               <div v-if="videoUrl" class="video-area" style="display: flex; justify-content: center;">
                 <video :src="videoUrl" controls preload="auto" width="100%"></video>
               </div>
-              <div v-else class="placeholder-box" style="width: 980px; height: 550px; display: flex; align-items: center; justify-content: center; margin: auto; background-color: #666666;">
+              <div v-else class="placeholder-box"
+                   style="width: 980px; height: 550px; display: flex; align-items: center; justify-content: center; margin: auto; background-color: #666666;">
                 <span style="color: white; font-size: 30px;">Select the game</span>
               </div>
               <div class="table-info-area" style="margin-top: 20px">
-                <div >
-                  Game : {{gameName}}
+                <div>
+                  Game : {{ gameName }}
                 </div>
                 <div class="table-wrap" style="display: flex; justify-content: center;">
                   <el-table id="ReportListTable" :data="videoListTableData" :table-layout='auto' style="width: 100%">
@@ -882,14 +895,15 @@ const toMainPage = () => router.push({ name: 'MainPage' });
               <div class="card-body ">
                 <div class="text-area">
                   <div class="type-info">
-                    Type : {{reportData.report_type}}
+                    Type : {{ reportData.report_type }}
                   </div>
-                  <div class="name-date-wrap" style="display: flex; justify-content: space-between; align-items: center">
+                  <div class="name-date-wrap"
+                       style="display: flex; justify-content: space-between; align-items: center">
                     <div class="name-info">
-                      Name : {{reportData.person_report_name}}
+                      Name : {{ reportData.person_report_name }}
                     </div>
                     <div class="date-info">
-                      {{formatDate(reportData.reg_datetime)}}
+                      {{ formatDate(reportData.reg_datetime) }}
                     </div>
                   </div>
                 </div>
@@ -939,7 +953,8 @@ const toMainPage = () => router.push({ name: 'MainPage' });
                 <h2 class="mb-0" style="color: #444444">Report Confirm</h2>
               </div>
               <div class="card-body">
-                <div class="name-date-wrap" style="display: flex; justify-content: space-between; align-items: center; margin-top: 25px">
+                <div class="name-date-wrap"
+                     style="display: flex; justify-content: space-between; align-items: center; margin-top: 25px">
                   <div class="name-info">
                     Confirmer : {{ confirmInfo.studio_manager_name }}
                   </div>
@@ -997,11 +1012,12 @@ const toMainPage = () => router.push({ name: 'MainPage' });
           </div>
         </div>
         <div class="mf" style="display: flex">
-          <div class="modal-footer" style="width: 50%; padding: 5px 5px; border-right: 0.5px solid #999999; border-bottom-right-radius: 0;">
+          <div class="modal-footer"
+               style="width: 50%; padding: 5px 5px; border-right: 0.5px solid #999999; border-bottom-right-radius: 0;">
             <button class="gray-btn" style="border-radius: 5px" data-bs-dismiss="modal">
               <span class="text">close</span></button>
           </div>
-          <div class="modal-footer" style="width: 50%; padding: 5px 5px" >
+          <div class="modal-footer" style="width: 50%; padding: 5px 5px">
             <button class="gray-btn green-btn" style="border-radius: 5px" @click="deleteReport" data-bs-dismiss="modal">
               <span class="text">Send</span></button>
           </div>
@@ -1080,13 +1096,14 @@ const toMainPage = () => router.push({ name: 'MainPage' });
   opacity: 1;
   transition: all 900ms cubic-bezier(0.48, 0, 0.12, 1);
 }
+
 .data-table-body {
   padding: 20px;
   border-radius: 10px;
   box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
 }
 
-.table-header{
+.table-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1105,7 +1122,7 @@ const toMainPage = () => router.push({ name: 'MainPage' });
   font-weight: bold;
 }
 
-.title-wrap{
+.title-wrap {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1122,12 +1139,14 @@ const toMainPage = () => router.push({ name: 'MainPage' });
 }
 
 /*Search Area*/
-.search-section{
+.search-section {
   display: flex;
 }
-.inner-box{
+
+.inner-box {
   margin-right: 1.8rem;
 }
+
 .search-box {
   margin: 20px 0;
   padding: 20px 30px;
@@ -1135,21 +1154,23 @@ const toMainPage = () => router.push({ name: 'MainPage' });
   box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
 }
 
-.search-inner-row{
+.search-inner-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
   gap: 20px;
 }
+
 .btn-box {
   display: flex;
   justify-content: flex-end;
   align-items: center;
 }
 
-.input-name{
+.input-name {
   color: black;
 }
+
 .btn-wrap {
   display: flex;
   justify-content: start;
@@ -1164,7 +1185,7 @@ const toMainPage = () => router.push({ name: 'MainPage' });
   margin: 0;
 }
 
-.deleteBtn{
+.deleteBtn {
   margin-right: 10px;
 }
 
@@ -1172,7 +1193,7 @@ p {
   margin: 0 10px;
 }
 
-.el-pagination{
+.el-pagination {
   float: right;
 }
 
@@ -1193,14 +1214,15 @@ p {
   opacity: 1;
   outline: 0;
   padding: 1rem 1rem;
-  border-radius: 10px ;
+  border-radius: 10px;
 }
 
-.gray-btn:hover{
+.gray-btn:hover {
   color: white;
   background-color: #777777;
   transition-duration: .5s;
 }
+
 .gray-btn:hover i {
   color: white;
 }
@@ -1224,8 +1246,9 @@ p {
   color: #FFFFFF;
   background-color: #64CD3C;
 }
+
 /* Dummy CSS  */
-.img-box, .name, .game-time{
+.img-box, .name, .game-time {
   display: flex;
   justify-content: center;
   align-items: center;
