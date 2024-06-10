@@ -65,7 +65,6 @@ const changePassword = async () => {
     });
 
     if (response.data.status === "success") {
-      console.log(response);
       Swal.fire({
         title: "Password change successful",
         icon: "success",
@@ -104,17 +103,13 @@ const nameChange = async () => {
     const response = await axios.put("https://v8test.com/pit/manager", {
       data: security.encrypt(querystring.stringify(data)),
     });
-    console.log(data)
-
     if (response.data.status === "success") {
-      console.log(response);
       Swal.fire({
         title: "Username change successful",
         icon: "success",
       })
       await store.dispatch('fetchPitManagerInfo');
     } else {
-      console.log(response)
       Swal.fire({
         icon: 'error',
         title: 'Information change failed',
@@ -142,8 +137,6 @@ const emailChange = async () => {
     const response = await axios.put("https://v8test.com/pit/manager", {
       data: security.encrypt(querystring.stringify(data)),
     });
-    console.log(data)
-
     if (response.data.status === "success") {
       console.log(response);
       Swal.fire({
@@ -159,8 +152,7 @@ const emailChange = async () => {
         text: 'failed'
       })
     }
-  } catch
-      (error) {
+  } catch (error) {
     console.error("Login error:", error);
   }
 };
@@ -186,25 +178,20 @@ const MFAChange = async () => {
     const response = await axios.put("https://v8test.com/pit/manager", {
       data: security.encrypt(querystring.stringify(data)),
     });
-    console.log(data)
-
     if (response.data.status === "success") {
-      console.log(response);
       Swal.fire({
         title: "User MFA change successful",
         icon: "success",
       })
       await store.dispatch('fetchPitManagerInfo');
     } else {
-      console.log(response)
       Swal.fire({
         icon: 'error',
         title: 'Information change failed',
         text: 'failed'
       })
     }
-  } catch
-      (error) {
+  } catch (error) {
     console.error("Login error:", error);
   }
 };
@@ -228,16 +215,12 @@ const changePhone = async () => {
     const response = await axios.put("https://v8test.com/pit/manager/phone", {
       data: security.encrypt(querystring.stringify(data)),
     });
-    console.log(data)
-
     if (response.data.status === "success") {
-      console.log(response);
       Swal.fire({
         title: "6-digit verification code sent",
         icon: "success",
       })
     } else {
-      console.log(response)
       Swal.fire({
         icon: 'error',
         title: 'Information change failed',
@@ -275,17 +258,13 @@ const changePhoneVerify = async () => {
     const response = await axios.put("https://v8test.com/pit/manager/phone/verify", {
       data: security.encrypt(querystring.stringify(data)),
     });
-    console.log(data)
-
     if (response.data.status === "success") {
-      console.log(response);
       Swal.fire({
         title: "phone number change successful",
         icon: "success",
       });
       clearPhone();
     } else {
-      console.log(response)
       Swal.fire({
         icon: 'error',
         title: 'Information change failed',

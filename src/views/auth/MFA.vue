@@ -44,7 +44,6 @@ const onSubmit = async () => {
       data: security.encrypt(querystring.stringify({id: userId.value, code:verifyCode.value, sessionId: sessionId.value})),
     });
     if (response.data.status === "success") {
-      console.log(response);
       const access_token = response.data.message.accessToken;
       const refresh_token = response.data.message.refreshToken;
       const pit_manager_id = response.data.message.pitManagerId;

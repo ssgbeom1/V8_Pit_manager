@@ -47,7 +47,6 @@ const fetchData = async () => {
       data: security.encrypt(querystring.stringify(data)),
     });
     if (response.data.status === 'success') {
-      console.log(response)
       totalPages.value = Math.ceil(response.data.message.RecordTotalCount / parseInt(length.value));
       total.value = response.data.message.RecordTotalCount;
       tableData.value = response.data.message.Info;
@@ -79,14 +78,15 @@ const sendVideoInfo = async () => {
       data: security.encrypt(querystring.stringify(data)),
     });
     if (response.data.status === 'success') {
-      console.log(response)
       resetSelectedUsers()
       router.push({ name: 'videoPage' });
     } else {
       console.error('Response error', response.data.message);
+      resetSelectedUsers()
     }
   } catch (error) {
     console.error("Error fetching data:", error);
+    resetSelectedUsers()
   }
 }
 
@@ -100,12 +100,9 @@ const toggleSelection = (row) => {
   const index = selectedVideoId.value.findIndex(u => u === row.game_real_time_lives_id);
   if (index === -1 && selectedVideoId.value.length < maxSelections) {
     selectedVideoId.value.push(row.game_real_time_lives_id);
-    console.log('Selected:', row.game_real_time_lives_id);
   } else if (index !== -1) {
     selectedVideoId.value.splice(index, 1);
-    console.log('Deselected:', row.game_real_time_lives_id);
   }
-  console.log('Current selected rows:', selectedVideoId.value);
 };
 
 // 클릭한 버튼의 row id 가져오기
