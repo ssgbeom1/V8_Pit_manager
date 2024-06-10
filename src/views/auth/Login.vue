@@ -40,6 +40,7 @@ const onSubmit = async () => {
       data: security.encrypt(querystring.stringify({id: id.value, password: password.value})),
     });
     if (response.data.status === "success" && response.data.message.is_mfa === true){
+      console.log(response.data.message)
       const MFA_id = response.data.message.id;
       const session_id = response.data.message.session_id;
       store.commit('setUserSession', { MFA_id, session_id });
@@ -57,6 +58,7 @@ const onSubmit = async () => {
       await store.dispatch('fetchPitManagerInfo');
       await router.push({name: 'MainPage'});
     } else {
+      console.log(response.data.message)
       Swal.fire({
         icon: 'error',
         title: 'Invalid Account',

@@ -15,14 +15,14 @@ const mfaDisplayValue = computed(() => {
 });
 
 
-// Password Edit ======================================================================================================>
 const CurrentPassword = ref('');
 const ChangePassword = ref('');
 const ChangePasswordConfirm = ref('');
 const accessToken = computed(() => store.state.accessToken);
 const pitManagerId = computed(() => store.state.pitManagerId);
+console.log(pitManagerId)
 
-const clearPasswordChange = () =>{
+const clearPasswordChange = () => {
   CurrentPassword.value = '';
   ChangePassword.value = '';
   ChangePasswordConfirm.value = '';
@@ -30,6 +30,7 @@ const clearPasswordChange = () =>{
 
 const changePassword = async () => {
   if (!CurrentPassword.value.trim() || !ChangePassword.value.trim() || !ChangePasswordConfirm.value.trim()) {
+    clearPasswordChange();
     Swal.fire({
       icon: 'error',
       title: 'Oops...',
@@ -37,7 +38,32 @@ const changePassword = async () => {
     });
     return;
   }
+
+  const passwordRegex = /^[A-Za-z]/;
+  const koreanRegex = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+
+  if (!passwordRegex.test(ChangePassword.value)) {
+    clearPasswordChange();
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: 'The new password must start with a letter.',
+    });
+    return;
+  }
+
+  if (koreanRegex.test(ChangePassword.value)) {
+    clearPasswordChange();
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: 'The new password must not contain Korean characters.',
+    });
+    return;
+  }
+
   if (CurrentPassword.value === ChangePasswordConfirm.value) {
+    clearPasswordChange();
     Swal.fire({
       icon: 'error',
       title: 'Oops...',
@@ -45,7 +71,9 @@ const changePassword = async () => {
     });
     return;
   }
-  if (ChangePassword.value !== ChangePasswordConfirm.value){
+
+  if (ChangePassword.value !== ChangePasswordConfirm.value) {
+    clearPasswordChange();
     Swal.fire({
       icon: 'error',
       title: 'Oops...',
@@ -53,17 +81,17 @@ const changePassword = async () => {
     });
     return;
   }
+
   try {
     const response = await axios.put("https://v8test.com/pit/manager/password", {
       data: security.encrypt(querystring.stringify(
           {
             accessToken: accessToken.value,
-            pitManagerId : pitManagerId.value,
+            pitManagerId: pitManagerId.value,
             previousPassword: CurrentPassword.value,
             proposedPassword: ChangePassword.value
           })),
     });
-
     if (response.data.status === "success") {
       Swal.fire({
         title: "Password change successful",
@@ -75,13 +103,12 @@ const changePassword = async () => {
       Swal.fire({
         icon: 'error',
         title: 'Password change failed',
-        text: 'The account information is not vaild'
-      })
+        text: 'The account information is not valid',
+      });
       clearPasswordChange();
       return;
     }
-  } catch
-      (error) {
+  } catch (error) {
     console.error("Login error:", error);
     clearPasswordChange();
   }
@@ -110,6 +137,7 @@ const nameChange = async () => {
       })
       await store.dispatch('fetchPitManagerInfo');
     } else {
+      console.log(response.data.message)
       Swal.fire({
         icon: 'error',
         title: 'Information change failed',
@@ -306,86 +334,79 @@ const toggleDefaultLayout = () => store.commit('toggleDefaultLayout');
     <div class="page-header min-vh-100" style="background-color: #444444;">
       <span class="mask bg-gradient-dark opacity-6"></span>
 
-        <div class="container-fluid py-4">
-          <div class="row">
-            <div class="col-8 mx-auto">
-              <div class="card my-5">
-                <div class="my-page-wrap">
-                  <div class="user-area">
-                    <div class="card user-card">
-                      <div class="logoImgBox">
-                        <img class="mainLogo" :src=pitManagerInfo.image_url>
+      <div class="container-fluid py-4">
+        <div class="row">
+          <div class="col-8 mx-auto">
+            <div class="card my-5">
+              <div class="my-page-wrap">
+                <div class="user-area">
+                  <div class="card user-card">
+                    <div class="logoImgBox">
+                      <img class="mainLogo" :src=pitManagerInfo.image_url>
+                    </div>
+                    <div class="user-text-area">
+                      <div class="userText">
+                        Welcome!
                       </div>
-                      <div class="user-text-area">
-                        <div class="userText">
-                          Welcome!
-                        </div>
-                        <div class="dealer-name">
-                          {{pitManagerInfo.name}}
-                        </div>
-                      </div>
-                      <div class="card dealer-card">
-                        <div style="font-size: 1.3rem; color: #222222">PitManager Info</div>
-                        <div>Win : 39Games</div>
-                        <div>Loss : 39Games</div>
-                        <div>Status : {{pitManagerInfo.type}}</div>
-                        <div>Withdraw : 333,000,000 $ </div>
+                      <div class="dealer-name">
+                        {{pitManagerInfo.name}}
                       </div>
                     </div>
                   </div>
-                  <div class="card-body pt-0 edit-area">
-                    <div class="infoBox">
-                      <div class="inputInfoText">
-                        ID
-                      </div>
-                      <el-input v-model="pitManagerInfo.id" style="width: 60%" size="large" disabled />
+                </div>
+                <div class="card-body pt-0 edit-area">
+                  <div class="infoBox">
+                    <div class="inputInfoText">
+                      ID
                     </div>
-                    <div class="infoBox">
-                      <div class="inputInfoText">
-                        Password
-                      </div>
-                      <el-input v-model="pitManagerInfo.id"  type="password" style="width: 60%" size="large" disabled />
-                      <el-button size="large" type="info" style="margin-left: 5px" data-bs-toggle="modal" data-bs-target="#passwordModal">Update</el-button>
+                    <el-input v-model="pitManagerInfo.id" style="width: 60%" size="large" disabled />
+                  </div>
+                  <div class="infoBox">
+                    <div class="inputInfoText">
+                      Password
                     </div>
-                    <div class="infoBox">
-                      <div class="inputInfoText">
-                        Name
-                      </div>
-                      <el-input v-model="pitManagerInfo.name" style="width: 60%" size="large" disabled />
-                      <el-button size="large" type="info" style="margin-left: 5px" data-bs-toggle="modal" data-bs-target="#nameModal">Update</el-button>
+                    <el-input v-model="pitManagerInfo.id"  type="password" style="width: 60%" size="large" disabled />
+                    <el-button class="update-btn" size="large" type="info" style="margin-left: 5px" data-bs-toggle="modal" data-bs-target="#passwordModal">Update</el-button>
+                  </div>
+                  <div class="infoBox">
+                    <div class="inputInfoText">
+                      Name
                     </div>
-                    <div class="infoBox">
-                      <div class="inputInfoText">
-                        E-mail
-                      </div>
-                      <el-input v-model="pitManagerInfo.email" style="width: 60%" size="large" disabled />
-                      <el-button size="large" type="info" style="margin-left: 5px" data-bs-toggle="modal" data-bs-target="#emailModal">Update</el-button>
+                    <el-input v-model="pitManagerInfo.name" style="width: 60%" size="large" disabled />
+                    <el-button class="update-btn" size="large" type="info" style="margin-left: 5px" data-bs-toggle="modal" data-bs-target="#nameModal">Update</el-button>
+                  </div>
+                  <div class="infoBox">
+                    <div class="inputInfoText">
+                      E-mail
                     </div>
-                    <div class="infoBox">
-                      <div class="inputInfoText">
-                        Phone Number
-                      </div>
-                      <el-input v-model="pitManagerInfo.phone" style="width: 60%" size="large" disabled />
-                      <el-button size="large" type="info" style="margin-left: 5px" data-bs-toggle="modal" data-bs-target="#phoneModal">Update</el-button>
+                    <el-input v-model="pitManagerInfo.email" style="width: 60%" size="large" disabled />
+                    <el-button class="update-btn" size="large" type="info" style="margin-left: 5px" data-bs-toggle="modal" data-bs-target="#emailModal">Update</el-button>
+                  </div>
+                  <div class="infoBox">
+                    <div class="inputInfoText">
+                      Phone Number
                     </div>
-                    <div class="lastBox">
-                      <div class="inputInfoText">
-                        MFA
-                      </div>
-                      <div class="span-box">
-                        <el-input v-model="mfaDisplayValue" style="width: 60%" size="large" disabled />
-                        <el-button size="large" type="info" style="margin-left: 5px" data-bs-toggle="modal" data-bs-target="#MFAModal">Update</el-button>
-                      </div>
+                    <el-input v-model="pitManagerInfo.phone" style="width: 60%" size="large" disabled />
+                    <el-button class="update-btn" size="large" type="info" style="margin-left: 5px" data-bs-toggle="modal" data-bs-target="#phoneModal">Update</el-button>
+                  </div>
+                  <div class="lastBox">
+                    <div class="inputInfoText">
+                      MFA
                     </div>
-                    <div class="text-center pt-1" >
+                    <div class="span-box">
+                      <el-input v-model="mfaDisplayValue" style="width: 60%" size="large" disabled />
+                      <el-button class="update-btn" size="large" type="info" style="margin-left: 5px" data-bs-toggle="modal" data-bs-target="#MFAModal">Update</el-button>
+                    </div>
+                  </div>
+                  <div class="text-center pt-1" >
 
-                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
     </div>
   </main>
 
@@ -403,17 +424,17 @@ const toggleDefaultLayout = () => store.commit('toggleDefaultLayout');
                 <div>
                   <div class="inputInfoText">CurrentPassword</div>
                   <el-input v-model="CurrentPassword" type="password" style="width: 100%" size="large"
-                            placeholder="CurrentPassword"/>
+                            placeholder="CurrentPassword" show-password/>
                 </div>
                 <div style="margin: 15px 0">
                   <div class="inputInfoText">ChangePassword</div>
                   <el-input v-model="ChangePassword" type="password" style="width: 100%" size="large"
-                            placeholder="ChangePassword"/>
+                            placeholder="ChangePassword" show-password/>
                 </div>
                 <div>
                   <div class="inputInfoText">ChangePasswordConfirm</div>
                   <el-input v-model="ChangePasswordConfirm" type="password" style="width: 100%" size="large"
-                            placeholder="ChangePasswordConfirm"/>
+                            placeholder="ChangePasswordConfirm" show-password/>
                 </div>
               </form>
             </div>
@@ -608,32 +629,23 @@ const toggleDefaultLayout = () => store.commit('toggleDefaultLayout');
   width: 90%;
   height: 90%;
 }
-.dealer-card{
-  width: 90%;
-  background-color: lightgray;
-  padding: 0 20px;
-  margin: 10px auto;
-  color: #777777;
-  font-size: 1rem;
-  font-weight: bold;
-}
-.dealer-card div{
-  margin: 5px 0;
-  font-size: 1rem;
-}
+
 .user-text-area{
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-bottom: 50px;
+  background-color: #444444;
+  padding: 10px 0;
 }
 .userText{
-  color: #222222;
-  font-size: 1.1rem;
+  color: white;
+  font-size: 1.4rem;
   margin-right: 10px;
 }
 .dealer-name{
-  color: #222222;
-  font-size: 1.2rem;
+  color: white;
+  font-size: 1.7rem;
   font-weight: bold;
 }
 .my-page-wrap{
@@ -644,12 +656,12 @@ const toggleDefaultLayout = () => store.commit('toggleDefaultLayout');
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 10rem;
-  height: 10rem;
+  width: 13rem;
+  height: 13rem;
   border-radius: 50%;
   overflow: hidden;
-  margin: 20px auto;
   border: 3px solid #444444;
+  margin: auto auto;
 }
 .infoBox{
   margin: 20px 0;
@@ -670,6 +682,11 @@ argon-button {
 .inputInfoText{
   font-size: 13px;
   font-weight: bold;
+}
+
+.update-btn{
+  font-weight: bold;
+  background-color: #444444;
 }
 
 /*Modal*/
