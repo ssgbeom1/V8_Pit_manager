@@ -4,6 +4,7 @@ import axios from "axios";
 import querystring from "querystring";
 import security from '../security'
 import createPersistedState from "vuex-persistedstate"
+import router from "@/router";
 
 export default createStore({
   plugins: [createPersistedState()],
@@ -102,23 +103,24 @@ export default createStore({
         await dispatch('fetchPitManagerInfo');
       } catch (error) {
         console.error("Error fetching pit manager info during login:", error);
+        await router.push({name: 'SignIn'});
       }
     },
-    fetchPitManagerInfo({ commit, state }) {
+    fetchPitManagerInfo({commit, state}) {
       axios.post("https://v8test.com/pit/manager/info", {
-        data: security.encrypt(querystring.stringify({ pitManagerId: state.pitManagerId })),
+        data: security.encrypt(querystring.stringify({pitManagerId: state.pitManagerId})),
       })
           .then(response => {
             if (response.data.status === "success") {
-              console.log('INFO:', response.data)
               commit('setPitManagerInfo', response.data.message.Info);
             } else {
               console.error("Fetching pit manager info failed with response:", response.data);
+              router.push({name: 'SignIn'});
             }
           })
           .catch(error => console.error("Fetching pit manager info failed:", error));
     },
-    logout({ commit }) {
+    logout({commit}) {
       commit('logout');
       localStorage.removeItem('vuex');
     },

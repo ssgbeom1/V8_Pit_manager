@@ -8,9 +8,7 @@ const router = useRouter();
 const pitManagerInfo = computed(() => store.state.pitManagerInfo);
 
 const logout = () => {
-  console.log(pitManagerInfo.value)
   store.dispatch('logout');
-  console.log(pitManagerInfo.value)
   router.push({ name: 'SignIn' });
 }
 
