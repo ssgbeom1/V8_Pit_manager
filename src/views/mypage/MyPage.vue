@@ -109,7 +109,11 @@ const changePassword = async () => {
       return;
     }
   } catch (error) {
-    console.error("Login error:", error);
+    Swal.fire({
+      title: "Something went wrong",
+      text: error,
+      icon: "error",
+    });
     clearPasswordChange();
   }
 };
@@ -144,9 +148,12 @@ const nameChange = async () => {
         text: 'failed'
       })
     }
-  } catch
-      (error) {
-    console.error("Login error:", error);
+  } catch (error) {
+    Swal.fire({
+      title: "Something went wrong",
+      text: error,
+      icon: "error",
+    });
   }
 };
 
@@ -179,7 +186,11 @@ const emailChange = async () => {
       })
     }
   } catch (error) {
-    console.error("Login error:", error);
+    Swal.fire({
+      title: "Something went wrong",
+      text: error,
+      icon: "error",
+    });
   }
 };
 
@@ -218,7 +229,11 @@ const MFAChange = async () => {
       })
     }
   } catch (error) {
-    console.error("Login error:", error);
+    Swal.fire({
+      title: "Something went wrong",
+      text: error,
+      icon: "error",
+    });
   }
 };
 
@@ -249,13 +264,16 @@ const changePhone = async () => {
     } else {
       Swal.fire({
         icon: 'error',
-        title: 'Information change failed',
+        title: '6-digit verification code sent failed',
         text: 'failed'
       })
     }
-  } catch
-      (error) {
-    console.error("Login error:", error);
+  } catch (error) {
+    Swal.fire({
+      title: "Something went wrong",
+      text: error,
+      icon: "error",
+    });
   }
 };
 const changePhoneVerify = async () => {
@@ -298,9 +316,12 @@ const changePhoneVerify = async () => {
       })
       clearPhone();
     }
-  } catch
-      (error) {
-    console.error("Login error:", error);
+  } catch (error) {
+    Swal.fire({
+      title: "Something went wrong",
+      text: error,
+      icon: "error",
+    });
     clearPhone();
   }
 };

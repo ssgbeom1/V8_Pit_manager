@@ -12,7 +12,6 @@ import Swal from "sweetalert2";
 
 const pitManagerId = computed(() => store.state.pitManagerInfo.pit_managers_id);
 
-//API응답 값 저장 (나중에 총 4개의 데이터를 받게되면 배열 형태로 변경해야함)
 const video_info= ref([])
 
 //GameIdInfo
@@ -21,23 +20,28 @@ const gameId = ref('')
 
 //Video Token fetch----------------------------------------------------------------------------------------------------->
 //비디오 토큰을 가져오는 API
+const loading = ref(true);
 const fetchData = async () => {
   try {
     const data = {
       pitManagerId: pitManagerId.value
-    }
+    };
     const response = await axios.post("https://v8test.com/pit/manager/game/live/monitoring/list", {
       data: security.encrypt(querystring.stringify(data)),
     });
     if (response.data.status === 'success') {
-      video_info.value = response.data.message
+      console.log(response.data.message);
+      video_info.value = response.data.message;
     } else {
       console.error('Response error', response.data.message);
     }
   } catch (error) {
     console.error("Error fetching data:", error);
+  } finally {
+    loading.value = false;
   }
 };
+
 
 
 //Live Video Info----------------------------------------------------------------------------------------------------->
@@ -68,12 +72,20 @@ const fetchLiveVideoInfo = async () => {
     console.error("Error fetching data:", error);
   }
 }
+
+const curr_game_name = ref('')
+
 const handleInfoClick = async (index) => {
   if (video_info.value[index] && video_info.value[index].games_id) {
     gameId.value = video_info.value[index].games_id;
+    curr_game_name.value = video_info.value[index].game_name;
     await fetchLiveVideoInfo();
   } else {
-    console.error("No games_id available for index", index);
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: 'No game available for Video '+ (index+1),
+    });
   }
 };
 
@@ -113,7 +125,11 @@ const handleTableClick = async (index) => {
     gameId.value = video_info.value[index].games_id;
     await fetchLiveVideoPlayBackInfo();
   } else {
-    console.error("No games_id available for index", index);
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: 'No game available for Video '+ (index+1),
+    });
   }
 };
 const handlePageChange = (newPage) => {
@@ -151,7 +167,6 @@ const fetchVideoView = async ( TableId ) => {
     });
     if (response.data.status === 'success') {
       videoUrl.value = response.data.message.url
-
     } else {
       console.error('Response error', response.data.message);
     }
@@ -168,10 +183,8 @@ const dealerId = ref('')
 const fetchDealerInfo = async () => {
   try {
     const data = {
-      // gameId: gameId.value,
-      gameId : 19
+      gameId: gameId.value,
     }
-
     const response = await axios.post("https://v8test.com/game/dealer/info", {
       data: security.encrypt(querystring.stringify(data)),
     });
@@ -190,7 +203,11 @@ const handleDealerInfo = async (index) => {
     gameId.value = video_info.value[index].games_id;
     await fetchDealerInfo();
   } else {
-    console.error("No games_id available for index", index);
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: 'No game available for Video '+ (index+1),
+    });
   }
 };
 
@@ -210,15 +227,29 @@ const SendVideoDescription = async () => {
       data: security.encrypt(querystring.stringify(data)),
     });
     if (response.data.status === 'success') {
+      Swal.fire({
+        title: "Video store successful",
+        icon: "success",
+      });
       gameTableIds.value = []
       description.value = ''
     } else {
-      console.error('Response error', response.data.message);
       gameTableIds.value = []
       description.value = ''
+      Swal.fire({
+        title: "Video store failed",
+        text: response.data.message,
+        icon: "error",
+      });
     }
   } catch (error) {
-    console.error("Error fetching data:", error);
+    Swal.fire({
+      title: "Something went wrong",
+      text: error,
+      icon: "error",
+    });
+    gameTableIds.value = []
+    description.value = ''
   }
 }
 
@@ -253,13 +284,21 @@ const sendDealerReport = async () => {
       description.value = '';
       selectedReportType.value = '';
     } else {
-      console.error('Response error', response.data.message);
+      Swal.fire({
+        title: "Report Sending failed",
+        text: response.data.message,
+        icon: "error",
+      });
       gameTableIds.value = [];
       description.value = '';
       selectedReportType.value = '';
     }
   } catch (error) {
-    console.error("Error fetching data:", error);
+    Swal.fire({
+      title: "Something went wrong",
+      text: error,
+      icon: "error",
+    });
     gameTableIds.value = [];
     description.value = '';
     selectedReportType.value = '';
@@ -296,13 +335,21 @@ const sendPlayerReport = async () => {
       description.value = '';
       selectedReportType.value = '';
     } else {
-      console.error('Response error', response.data.message);
+      Swal.fire({
+        title: "Report Sending failed",
+        text: response.data.message,
+        icon: "error",
+      });
       gameTableIds.value = [];
       description.value = '';
       selectedReportType.value = '';
     }
   } catch (error) {
-    console.error("Error fetching data:", error);
+    Swal.fire({
+      title: "Something went wrong",
+      text: error,
+      icon: "error",
+    });
     gameTableIds.value = [];
     description.value = '';
     selectedReportType.value = '';
@@ -341,12 +388,18 @@ const fetchPlayerList = async () => {
     console.error("Error fetching data:", error);
   }
 }
+
+
 const handlePlayerInfo = async (index) => {
   if (video_info.value[index] && video_info.value[index].games_id) {
     gameId.value = video_info.value[index].games_id;
     await fetchPlayerList();
   } else {
-    console.error("No games_id available for index", index);
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: 'No game available for Video '+ (index+1),
+    });
   }
 };
 
@@ -435,6 +488,10 @@ async function joinStage(index) {
     videoEl.muted = true;
     streamsToDisplay.forEach(stream => videoEl.srcObject.addTrack(stream.mediaStreamTrack));
   });
+
+  if (stages[0]) {
+    handleInfoClick(0)
+  }
 
   try {
     await stages[index].join();
@@ -592,13 +649,20 @@ const clearReportData = () => {
     </button>
   </div>
   <main class="main-content mt-0 main-content-bg" style="background-color: #222222">
+
     <div class="container-fluid min-vh-100 page-header">
       <section class="layout">
         <div class="left-up">
           <div class="title">
-            Dealer Info
+            Monitoring Info
           </div>
           <div class="inner-info">
+            <div class="form-group">
+              <label for="dealerName" style="color: white">Game Name</label>
+              <input
+                  id="dealerName" v-model="curr_game_name" type="text" class="form-control"
+                  disabled>
+            </div>
             <div class="form-group">
               <label for="dealerName" style="color: white">Dealer Name</label>
               <input
@@ -625,24 +689,32 @@ const clearReportData = () => {
             <video id="ivsRealStreamingVideoView1" style="width: 100%; height: 100%" class="videoTag" autoplay muted></video>
             <div class="video-controls">
               <div class="video-mode">
-                <button class="video-button play-back" @click="handleTableClick(0)" data-bs-toggle="modal" data-bs-target="#playBackModal">Play/Back</button>
-                <button class="video-button dealer" @click="dealerMacro(0)" data-bs-toggle="modal" data-bs-target="#dealerModal">Dealer</button>
-                <button class="video-button player" @click="playerMacro(0)" data-bs-toggle="modal" data-bs-target="#playerModal">Player</button>
-                <button class="video-button report">Report(no-usage)</button>
+                <button class="video-button play-back" @click="handleTableClick(0)" data-bs-toggle="modal" data-bs-target="#playBackModal" :disabled="!video_info[0]">Play/Back</button>
+                <button class="video-button dealer" @click="dealerMacro(0)" data-bs-toggle="modal" data-bs-target="#dealerModal" :disabled="!video_info[0]">Dealer</button>
+                <button class="video-button player" @click="playerMacro(0)" data-bs-toggle="modal" data-bs-target="#playerModal" :disabled="!video_info[0]">Player</button>
+                <button class="video-button report" :disabled="!video_info[0]">Report(no-usage)</button>
               </div>
               <div class="video-info">
-                <button class="video-button info1" @click="handleInfoClick(0)">
+                <button class="video-button info1" @click="handleInfoClick(0)" :disabled="!video_info[0]">
                   <i class="fa-solid fa-circle-info"></i>
                 </button>
               </div>
             </div>
             <div class="video-footer">
-              <button class="footer-button save" @click="handleTableClick(0)" data-bs-toggle="modal" data-bs-target="#saveVideoModal">
-                <i class="fa-regular fa-floppy-disk"></i>
-              </button>
-              <button class="footer-button fullscreen" @click="toggleFullscreen(0)" data-bs-toggle="modal" data-bs-target="#videoLarge1">
-                <i class="fa-solid fa-up-right-and-down-left-from-center" style="color: #ffffff;"></i>
-              </button>
+              <div v-if="video_info[0]" class="video-num">
+                Game Name : {{ video_info[0].game_name }}
+              </div>
+              <div v-else class="video-num" style="color:red">
+                No video selected
+              </div>
+              <div class="foo-btn-wrap">
+                <button class="footer-button save" @click="handleTableClick(0)" data-bs-toggle="modal" data-bs-target="#saveVideoModal" :disabled="!video_info[0]">
+                  <i class="fa-regular fa-floppy-disk"></i>
+                </button>
+                <button class="footer-button fullscreen" @click="toggleFullscreen(0)" data-bs-toggle="modal" data-bs-target="#videoLarge1" :disabled="!video_info[0]">
+                  <i class="fa-solid fa-up-right-and-down-left-from-center" style="color: #ffffff;"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -651,24 +723,32 @@ const clearReportData = () => {
             <video id="ivsRealStreamingVideoView2" style="width: 100%; height: 100%" class="videoTag" autoplay muted></video>
             <div class="video-controls">
               <div class="video-mode">
-                <button class="video-button play-back" @click="handleTableClick(1)" data-bs-toggle="modal" data-bs-target="#playBackModal">Play/Back</button>
-                <button class="video-button dealer" @click="dealerMacro(1)" data-bs-toggle="modal" data-bs-target="#dealerModal">Dealer</button>
-                <button class="video-button player" @click="playerMacro(1)" data-bs-toggle="modal" data-bs-target="#playerModal">Player</button>
-                <button class="video-button report">Report(no-usage)</button>
+                <button class="video-button play-back" @click="handleTableClick(1)" data-bs-toggle="modal" data-bs-target="#playBackModal" :disabled="!video_info[1]">Play/Back</button>
+                <button class="video-button dealer" @click="dealerMacro(1)" data-bs-toggle="modal" data-bs-target="#dealerModal" :disabled="!video_info[1]">Dealer</button>
+                <button class="video-button player" @click="playerMacro(1)" data-bs-toggle="modal" data-bs-target="#playerModal" :disabled="!video_info[1]">Player</button>
+                <button class="video-button report" :disabled="!video_info[1]">Report(no-usage)</button>
               </div>
               <div class="video-info2">
-                <button class="video-button info" @click="handleInfoClick(1)">
+                <button class="video-button info" @click="handleInfoClick(1)" :disabled="!video_info[1]">
                   <i class="fa-solid fa-circle-info"></i>
                 </button>
               </div>
             </div>
             <div class="video-footer">
-              <button class="footer-button save" @click="handleTableClick(1)" data-bs-toggle="modal" data-bs-target="#saveVideoModal">
-                <i class="fa-regular fa-floppy-disk"></i>
-              </button>
-              <button class="footer-button fullscreen" @click="toggleFullscreen(1)" data-bs-toggle="modal" data-bs-target="#videoLarge2">
-                <i class="fa-solid fa-up-right-and-down-left-from-center" style="color: #ffffff;"></i>
-              </button>
+              <div v-if="video_info[1]" class="video-num">
+                Game Name : {{ video_info[1].game_name }}
+              </div>
+              <div v-else class="video-num" style="color:red">
+                No video selected
+              </div>
+              <div class="foo-btn-wrap">
+                <button class="footer-button save" @click="handleTableClick(1)" data-bs-toggle="modal" data-bs-target="#saveVideoModal" :disabled="!video_info[1]">
+                  <i class="fa-regular fa-floppy-disk"></i>
+                </button>
+                <button class="footer-button fullscreen" @click="toggleFullscreen(1)" data-bs-toggle="modal" data-bs-target="#videoLarge2" :disabled="!video_info[1]">
+                  <i class="fa-solid fa-up-right-and-down-left-from-center" style="color: #ffffff;"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -701,30 +781,35 @@ const clearReportData = () => {
         </div>
         <div class="center-down-left video-container">
           <div class="video-wrapper">
-            <video id="ivsRealStreamingVideoView3" style="width: 100%; height: 100%" class="videoTag" autoplay
-                   muted></video>
+            <video id="ivsRealStreamingVideoView3" style="width: 100%; height: 100%" class="videoTag" autoplay muted></video>
             <div class="video-controls">
               <div class="video-mode">
-                <button class="video-button play-back" @click="handleTableClick(2)" data-bs-toggle="modal"
-                        data-bs-target="#playBackModal">Play/Back
-                </button>
-                <button class="video-button dealer" @click="dealerMacro(2)" data-bs-toggle="modal" data-bs-target="#dealerModal">Dealer</button>
-                <button class="video-button player" @click="playerMacro(2)" data-bs-toggle="modal" data-bs-target="#playerModal">Player</button>
-                <button class="video-button report">Report(no-usage)</button>
+                <button class="video-button play-back" @click="handleTableClick(2)" data-bs-toggle="modal" data-bs-target="#playBackModal" :disabled="!video_info[2]">Play/Back</button>
+                <button class="video-button dealer" @click="dealerMacro(2)" data-bs-toggle="modal" data-bs-target="#dealerModal" :disabled="!video_info[2]">Dealer</button>
+                <button class="video-button player" @click="playerMacro(2)" data-bs-toggle="modal" data-bs-target="#playerModal" :disabled="!video_info[2]">Player</button>
+                <button class="video-button report" :disabled="!video_info[2]">Report(no-usage)</button>
               </div>
-              <div class="video-info3" @click="handleInfoClick(2)">
-                <button class="video-button info">
+              <div class="video-info3">
+                <button class="video-button info" @click="handleInfoClick(2)" :disabled="!video_info[2]">
                   <i class="fa-solid fa-circle-info"></i>
                 </button>
               </div>
             </div>
             <div class="video-footer">
-              <button class="footer-button save" @click="handleTableClick(2)" data-bs-toggle="modal" data-bs-target="#saveVideoModal">
-                <i class="fa-regular fa-floppy-disk"></i>
-              </button>
-              <button class="footer-button fullscreen" @click="toggleFullscreen(2)" data-bs-toggle="modal" data-bs-target="#videoLarge3">
-                <i class="fa-solid fa-up-right-and-down-left-from-center" style="color: #ffffff;"></i>
-              </button>
+              <div v-if="video_info[2]" class="video-num">
+                Game Name : {{ video_info[2].game_name }}
+              </div>
+              <div v-else class="video-num" style="color:red">
+                No video selected
+              </div>
+              <div class="foo-btn-wrap">
+                <button class="footer-button save" @click="handleTableClick(2)" data-bs-toggle="modal" data-bs-target="#saveVideoModal" :disabled="!video_info[2]">
+                  <i class="fa-regular fa-floppy-disk"></i>
+                </button>
+                <button class="footer-button fullscreen" @click="toggleFullscreen(2)" data-bs-toggle="modal" data-bs-target="#videoLarge3" :disabled="!video_info[2]">
+                  <i class="fa-solid fa-up-right-and-down-left-from-center" style="color: #ffffff;"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -733,24 +818,33 @@ const clearReportData = () => {
             <video id="ivsRealStreamingVideoView4" style="width: 100%; height: 100%" class="videoTag" autoplay muted></video>
             <div class="video-controls">
               <div class="video-mode">
-                <button class="video-button play-back" @click="handleTableClick(3)" data-bs-toggle="modal" data-bs-target="#playBackModal">Play/Back</button>
-                <button class="video-button dealer" @click="dealerMacro(3)" data-bs-toggle="modal" data-bs-target="#dealerModal">Dealer</button>
-                <button class="video-button player" @click="playerMacro(3)" data-bs-toggle="modal" data-bs-target="#playerModal">Player</button>
-                <button class="video-button report">Report(no-usage)</button>
+                <button class="video-button play-back" @click="handleTableClick(3)" data-bs-toggle="modal" data-bs-target="#playBackModal" :disabled="!video_info[3]">Play/Back</button>
+                <button class="video-button dealer" @click="dealerMacro(3)" data-bs-toggle="modal" data-bs-target="#dealerModal" :disabled="!video_info[3]">Dealer</button>
+                <button class="video-button player" @click="playerMacro(3)" data-bs-toggle="modal" data-bs-target="#playerModal" :disabled="!video_info[3]">Player</button>
+                <button class="video-button report" :disabled="!video_info[3]">Report(no-usage)</button>
               </div>
-              <div class="video-info4" @click="handleInfoClick(3)">
-                <button class="video-button info">
+              <div class="video-info4">
+                <button class="video-button info" @click="handleInfoClick(3)" :disabled="!video_info[3]">
                   <i class="fa-solid fa-circle-info"></i>
                 </button>
               </div>
             </div>
+
             <div class="video-footer">
-              <button class="footer-button save" @click="handleTableClick(3)" data-bs-toggle="modal" data-bs-target="#saveVideoModal">
-                <i class="fa-regular fa-floppy-disk"></i>
-              </button>
-              <button class="footer-button fullscreen" @click="toggleFullscreen(3)" data-bs-toggle="modal" data-bs-target="#videoLarge4">
-                <i class="fa-solid fa-up-right-and-down-left-from-center" style="color: #ffffff;"></i>
-              </button>
+              <div v-if="video_info[3]" class="video-num">
+                Game Name : {{ video_info[3].game_name }}
+              </div>
+              <div v-else class="video-num" style="color:red">
+                No video selected
+              </div>
+              <div class="foo-btn-wrap">
+                <button class="footer-button save" @click="handleTableClick(3)" data-bs-toggle="modal" data-bs-target="#saveVideoModal" :disabled="!video_info[3]">
+                  <i class="fa-regular fa-floppy-disk"></i>
+                </button>
+                <button class="footer-button fullscreen" @click="toggleFullscreen(3)" data-bs-toggle="modal" data-bs-target="#videoLarge4" :disabled="!video_info[3]">
+                  <i class="fa-solid fa-up-right-and-down-left-from-center" style="color: #ffffff;"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1398,9 +1492,17 @@ h5{
   width: 100%;
   position: absolute;
   display: flex;
-  justify-content: right;
+  justify-content: space-between;
   pointer-events: auto;
   background-color: rgba(0, 0, 0, 0.5);
+  bottom: 3px;
+}
+
+.video-num{
+  color: green;
+  font-weight: bold;
+  margin: auto 0;
+  padding-left: 10px;
 }
 
 
@@ -1408,9 +1510,7 @@ h5{
   top: 3px;
 }
 
-.video-footer {
-  bottom: 3px;
-}
+
 
 .video-button {
   background-color: rgba(0, 0, 0, 0);

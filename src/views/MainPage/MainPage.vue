@@ -60,7 +60,6 @@ const fetchData = async () => {
 
 //선택한 VideoID를 통해 API 요청
 const sendVideoInfo = async () => {
-  console.log(Array.isArray(selectedVideoId.value))
   if(selectedVideoId.value.length === 0){
     Swal.fire({
       icon: 'error',
@@ -249,9 +248,13 @@ const toggleDefaultLayout = () => store.commit('toggleDefaultLayout');
                       >
                         <template #prepend>
                           <el-select v-model="searchOption" placeholder="Search Option" size="large" style="width: 150px">
-                            <el-option label="1" value="" />
-                            <el-option label="2." value="" />
-                            <el-option label="3" value="" />
+                            <el-option label="ALL" value="" />
+                            <el-option label="ID" value="id" />
+                            <el-option label="Name" value="name" />
+                            <el-option label="E-mail" value="email" />
+                            <el-option label="Phone" value="phone" />
+                            <el-option label="Studio Name" value="studioName" />
+                            <el-option label="Monitoring" value="monitoring" />
                           </el-select>
                         </template>
                       </el-input>

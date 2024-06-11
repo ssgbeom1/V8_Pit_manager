@@ -166,12 +166,20 @@ const sendDealerReport = async () => {
       description.value = ''
       selectedReportType.value = ''
     } else {
-      console.error('Response error', response.data.message);
+      Swal.fire({
+        title: "Report Sending failed",
+        text: response.data.message,
+        icon: "error",
+      });
       description.value = ''
       selectedReportType.value = ''
     }
   } catch (error) {
-    console.error("Error fetching data:", error);
+    Swal.fire({
+      title: "Something went wrong",
+      text: error,
+      icon: "error",
+    });
     description.value = ''
     selectedReportType.value = ''
   }
@@ -208,13 +216,21 @@ const sendPlayerReport = async () => {
       selectedReportType.value = ''
       playerName.value =''
     } else {
-      console.error('Response error', response.data.message);
+      Swal.fire({
+        title: "Report Sending failed",
+        text: response.data.message,
+        icon: "error",
+      });
       description.value = ''
       selectedReportType.value = ''
       playerName.value =''
     }
   } catch (error) {
-    console.error("Error fetching data:", error);
+    Swal.fire({
+      title: "Something went wrong",
+      text: error,
+      icon: "error",
+    });
     description.value = ''
     selectedReportType.value = ''
     playerName.value =''
@@ -267,10 +283,18 @@ const deleteReport = async () => {
       });
       fetchData()
     } else {
-      console.error('Response error', response.data.message);
+      Swal.fire({
+        title: "Report delete failed",
+        text: response.data.message,
+        icon: "error",
+      });
     }
   } catch (error) {
-    console.error("Error fetching data:", error);
+    Swal.fire({
+      title: "Something went wrong",
+      text: error,
+      icon: "error",
+    });
   }
 }
 

@@ -74,6 +74,7 @@ const fetchData = async () => {
 const reportId = ref('')
 const reportData = ref([])
 const reportTable = ref([])
+
 const fetchReportinfo = async (reportedId) => {
   try {
     reportId.value = reportedId
@@ -86,6 +87,7 @@ const fetchReportinfo = async (reportedId) => {
     if (response.data.status === 'success') {
       reportData.value = response.data.message.Info;
       reportTable.value= JSON.parse(response.data.message.Info.game_tables_ids)
+      gameTableIds.value = reportTable.value;
     } else {
       console.error('Response error', response.data.message);
     }
@@ -117,6 +119,7 @@ const fetchVideoStoreList = async () => {
     console.error("Error fetching data:", error);
   }
 };
+
 function addTable(event) {
   const newTableId = event;
   if (!gameTableIds.value.includes(newTableId)) {
@@ -158,11 +161,19 @@ const sendUpdatedDescription = async () => {
       });
       clearReport();
     } else {
-      console.error('Response error', response.data.message);
+      Swal.fire({
+        title: "Report update failed",
+        text: response.data.message,
+        icon: "error",
+      });
       clearReport();
     }
   } catch (error) {
-    console.error("Error fetching data:", error);
+    Swal.fire({
+      title: "Something went wrong",
+      text: error,
+      icon: "error",
+    });
     clearReport();
   }
 };
@@ -229,11 +240,19 @@ const deleteReport = async () => {
       description.value = ''
       fetchData()
     } else {
-      console.error('Response error', response.data.message);
+      Swal.fire({
+        title: "Report delete failed",
+        text: response.data.message,
+        icon: "error",
+      });
       description.value = ''
     }
   } catch (error) {
-    console.error("Error fetching data:", error);
+    Swal.fire({
+      title: "Something went wrong",
+      text: error,
+      icon: "error",
+    });
     description.value = ''
   }
 }
@@ -517,7 +536,6 @@ const toMainPage = () => router.push({name: 'MainPage'});
                       <el-option label="All" value="none"/>
                       <el-option label="Name" value="name"/>
                       <el-option label="Game" value="game"/>
-                      <el-option label="Type" value="type"/>
                       <el-option label="Table" value="table"/>
                     </el-select>
                   </template>
@@ -713,17 +731,10 @@ const toMainPage = () => router.push({name: 'MainPage'});
             </div>
             <div class="report-desc-area">
               <textarea
-                  v-model="reportData.report_type"
-                  name="reason" rows="10"
-                  style="width: 100%; padding: 10px; box-sizing: border-box;"
-                  placeholder="Write a Description"
-                  disabled
-              ></textarea>
-              <textarea
                   v-model="reportData.description"
                   name="reason"
-                  rows="4"
-                  style="width: 100%; padding: 10px; box-sizing: border-box;"
+                  rows="10"
+                  style="width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box;"
                   placeholder="write the reason for the update"
                   disabled
               ></textarea>
@@ -733,18 +744,18 @@ const toMainPage = () => router.push({name: 'MainPage'});
                 Table Video
               </div>
               <div class="table-wrap" style="display: flex; justify-content: left;">
-                <template v-if="reportTable">
-                  <button
+                <template v-if="reportTable && reportTable.length > 0">
+                  <el-tag
                       v-for="(tableId, index) in reportTable"
                       :key="index"
-                      class="btn btn-secondary"
+                      class="table-tag"
+                      type="info"
                       style="margin-right: 10px;"
-                      disabled
+                      disable-transitions
                   >
-                    {{ tableId }}
-                  </button>
+                    Table {{ tableId }}
+                  </el-tag>
                 </template>
-
                 <div v-else style="flex-grow: 1; text-align: center; color: grey;">
                   No table selected
                 </div>
@@ -790,8 +801,8 @@ const toMainPage = () => router.push({name: 'MainPage'});
               </div>
             </div>
             <div class="report-desc-area">
-              <argon-input v-model="reportData.report_type" type="text" placeholder="Report Type" is-disabled=true
-                           style="margin-top: 10px"></argon-input>
+              <el-input v-model="reportData.report_type" type="text" placeholder="Report Type" disabled=true
+                           style="margin: 10px 0"></el-input>
               <textarea id="description" v-model="description" name="reason" rows="10"
                         style="width: 100%; padding: 10px; box-sizing: border-box;"
                         placeholder="Write a Description"></textarea>
@@ -936,18 +947,18 @@ const toMainPage = () => router.push({name: 'MainPage'});
                     Table Video
                   </div>
                   <div class="table-wrap" style="display: flex; justify-content: left;">
-                    <template v-if="reportTable">
-                      <button
+                    <template v-if="reportTable && reportTable.length > 0">
+                      <el-tag
                           v-for="(tableId, index) in reportTable"
                           :key="index"
-                          class="btn btn-secondary"
+                          class="table-tag"
+                          type="info"
                           style="margin-right: 10px;"
-                          disabled
+                          disable-transitions
                       >
-                        {{ tableId }}
-                      </button>
+                        Table {{ tableId }}
+                      </el-tag>
                     </template>
-
                     <div v-else style="flex-grow: 1; text-align: center; color: grey;">
                       No table selected
                     </div>
