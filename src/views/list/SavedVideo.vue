@@ -847,8 +847,8 @@ const isSearchDisabled = computed(() => searchOption.value === 'none');
               <h2 class="mb-0" style="color: #444444">Remove</h2>
             </div>
             <div class="card-body ">
-              <div class="title">
-                Are you sure to delete a saved video?
+              <div class="del-title">
+                Are you sure to <br> delete a saved video?
               </div>
             </div>
           </div>
@@ -1103,6 +1103,14 @@ const isSearchDisabled = computed(() => searchOption.value === 'none');
 
 .input-name{
   color: black;
+}
+
+/*Modal*/
+.del-title{
+  font-size: 30px;
+  color: black;
+  text-align: center;
+
 }
 
 .btn-wrap {

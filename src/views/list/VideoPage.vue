@@ -692,7 +692,7 @@ const clearReportData = () => {
                 <button class="video-button play-back" @click="handleTableClick(0)" data-bs-toggle="modal" data-bs-target="#playBackModal" :disabled="!video_info[0]">Play/Back</button>
                 <button class="video-button dealer" @click="dealerMacro(0)" data-bs-toggle="modal" data-bs-target="#dealerModal" :disabled="!video_info[0]">Dealer</button>
                 <button class="video-button player" @click="playerMacro(0)" data-bs-toggle="modal" data-bs-target="#playerModal" :disabled="!video_info[0]">Player</button>
-                <button class="video-button report" :disabled="!video_info[0]">Report(no-usage)</button>
+<!--                <button class="video-button report" :disabled="!video_info[0]">Report(no-usage)</button>-->
               </div>
               <div class="video-info">
                 <button class="video-button info1" @click="handleInfoClick(0)" :disabled="!video_info[0]">
@@ -726,7 +726,7 @@ const clearReportData = () => {
                 <button class="video-button play-back" @click="handleTableClick(1)" data-bs-toggle="modal" data-bs-target="#playBackModal" :disabled="!video_info[1]">Play/Back</button>
                 <button class="video-button dealer" @click="dealerMacro(1)" data-bs-toggle="modal" data-bs-target="#dealerModal" :disabled="!video_info[1]">Dealer</button>
                 <button class="video-button player" @click="playerMacro(1)" data-bs-toggle="modal" data-bs-target="#playerModal" :disabled="!video_info[1]">Player</button>
-                <button class="video-button report" :disabled="!video_info[1]">Report(no-usage)</button>
+<!--                <button class="video-button report" :disabled="!video_info[1]">Report(no-usage)</button>-->
               </div>
               <div class="video-info2">
                 <button class="video-button info" @click="handleInfoClick(1)" :disabled="!video_info[1]">
@@ -787,7 +787,7 @@ const clearReportData = () => {
                 <button class="video-button play-back" @click="handleTableClick(2)" data-bs-toggle="modal" data-bs-target="#playBackModal" :disabled="!video_info[2]">Play/Back</button>
                 <button class="video-button dealer" @click="dealerMacro(2)" data-bs-toggle="modal" data-bs-target="#dealerModal" :disabled="!video_info[2]">Dealer</button>
                 <button class="video-button player" @click="playerMacro(2)" data-bs-toggle="modal" data-bs-target="#playerModal" :disabled="!video_info[2]">Player</button>
-                <button class="video-button report" :disabled="!video_info[2]">Report(no-usage)</button>
+<!--                <button class="video-button report" :disabled="!video_info[2]">Report(no-usage)</button>-->
               </div>
               <div class="video-info3">
                 <button class="video-button info" @click="handleInfoClick(2)" :disabled="!video_info[2]">
@@ -821,7 +821,7 @@ const clearReportData = () => {
                 <button class="video-button play-back" @click="handleTableClick(3)" data-bs-toggle="modal" data-bs-target="#playBackModal" :disabled="!video_info[3]">Play/Back</button>
                 <button class="video-button dealer" @click="dealerMacro(3)" data-bs-toggle="modal" data-bs-target="#dealerModal" :disabled="!video_info[3]">Dealer</button>
                 <button class="video-button player" @click="playerMacro(3)" data-bs-toggle="modal" data-bs-target="#playerModal" :disabled="!video_info[3]">Player</button>
-                <button class="video-button report" :disabled="!video_info[3]">Report(no-usage)</button>
+<!--                <button class="video-button report" :disabled="!video_info[3]">Report(no-usage)</button>-->
               </div>
               <div class="video-info4">
                 <button class="video-button info" @click="handleInfoClick(3)" :disabled="!video_info[3]">
